@@ -39,16 +39,18 @@
             font-family: 'Corporate-Logo-Medium', sans-serif;
         }
 
-        body {
+         body {
             background-color: var(--bg);
             color: #fff;
             margin: 0;
             padding-top: 60px;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
+            flex-direction: column; /* 縦に並べる */
+            align-items: center;    /* 中央に寄せる */
+            min-height: 100vh;      /* 画面全体の高さを確保 */
+            box-sizing: border-box;
         }
+
 
         /* ページ上部の白いバー：大きな文字扱い */
         .top-white-bar {
@@ -203,7 +205,17 @@
     </div>
 </div>
 
-
+</div> <footer style="width: 100%; margin-top: auto; padding: 20px 0; text-align: center;">
+        <div style="font-size: 12px; line-height: 1.5; color: #ccc;">
+            このサイトは 
+            <a href="https://x.com/limbustrpg" target="_blank" style="color: #5560aa; text-decoration: none;">@limbustrpg</a> 
+            様制作のTRPGシステム用非公式キャラクターシートメーカーです。
+            <br>
+            不具合や要望、更新情報は 
+            <a href="https://x.com/Roro_Crate" target="_blank" style="color: #5560aa; text-decoration: none;">@Roro_Crate</a> 
+            まで
+        </div>
+    </footer>
 <script>
     const DATA_DIR = './data/';
     const CSV_FILE_MAP = {
@@ -214,8 +226,8 @@
         'ego': { name: 'E.G.O', url: DATA_DIR + 'ego.tsv' },
         'status': { name: '状態異常', url: DATA_DIR + 'status.tsv' },
         'item': { name: 'アイテム', url: DATA_DIR + 'item.tsv' },
-        'strengthening': { name: '身体強化', url: DATA_DIR + 'strengthening.tsv' },
-        'others': { name: 'その他', url: DATA_DIR + 'others.tsv' }
+        'others': { name: 'その他', url: DATA_DIR + 'others.tsv' },
+        'strengthening': { name: '身体強化', url: DATA_DIR + 'strengthening.tsv' }
     };
 
     const SEARCH_FIELDS = {
@@ -373,5 +385,3 @@
 
 </body>
 </html>
-
-
