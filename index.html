@@ -2,15 +2,13 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>データベース検索ツール</title>
+<title>データベース検索システム</title>
 <style>
-/* --- root変数と基本スタイル (style.cssより) --- */
 :root {
     --bg: #071121;
     --card: #0b1220;
     --muted: #9aa6b2;
     --accent: #60a5fa;
-    --glass: rgba(255, 255, 255, 0.03);
     --radius: 12px;
     font-family: 'Noto Sans JP', sans-serif;
 }
@@ -18,52 +16,25 @@
 body {
     background-color: var(--bg);
     color: #fff;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+/* 検索コンテナの中央配置 */
+.search-container {
+    background: var(--card);
+    padding: 30px;
+    border-radius: var(--radius);
+    width: 90%;
+    max-width: 800px;
+    border: 1px solid var(--accent);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
     margin: 20px;
 }
 
-.btn {
-    padding: 10px 20px;
-    background: var(--accent);
-    color: #000;
-    border: none;
-    border-radius: var(--radius);
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* --- 検索モーダルのスタイル --- */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 10000;
-    left: 0; top: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(5px);
-    justify-content: center;
-    align-items: center;
-}
-
-.modal-content {
-    background: var(--card);
-    padding: 24px;
-    border-radius: var(--radius);
-    width: 90%;
-    max-width: 750px;
-    max-height: 90vh;
-    overflow-y: auto;
-    border: 1px solid var(--accent);
-    position: relative;
-}
-
-.close-btn {
-    position: absolute;
-    right: 15px; top: 15px;
-    font-size: 28px;
-    color: var(--muted);
-    cursor: pointer;
-}
-
-/* --- 検索フォームのレイアウト --- */
 .search-controls {
     display: flex;
     flex-direction: column;
@@ -81,7 +52,7 @@ body {
     box-sizing: border-box;
 }
 
-input[type="text"], select {
+input[type="text"], input[type="number"], select {
     width: 100%;
     padding: 10px;
     background: #1e203d;
@@ -98,13 +69,12 @@ label {
     margin-bottom: 4px;
 }
 
-/* --- 検索結果のスタイル --- */
+/* 検索結果エリア */
 #searchResultWrapper {
     margin-top: 20px;
-    padding: 10px;
-    border: 1px solid var(--accent);
-    border-radius: 8px;
-    background-color: rgba(0, 0, 0, 0.2);
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 
 .search-result-item {
@@ -113,50 +83,55 @@ label {
     margin-bottom: 10px;
     border-radius: 8px;
     border-left: 4px solid var(--accent);
+    position: relative;
     font-size: 0.9rem;
-    line-height: 1.6;
 }
 
-.search-result-item strong {
-    color: var(--accent);
+.copy-btn {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.copy-btn:hover { opacity: 0.8; }
+
+@media (max-width: 600px) {
+    .search-input-group { width: 100%; }
 }
 </style>
 </head>
 <body>
 
-<button id="searchButton" class="btn">データ検索を開く</button>
+<div class="search-container">
+    <h2 style="margin-top:0; text-align:center; color:var(--accent);">DATABASE SEARCH</h2>
 
-<div id="searchModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn">&times;</span>
-        <h2 style="margin-top:0;">データベース検索</h2>
-
-        <div class="search-controls">
-            <div>
-                <label>検索対象データ</label>
-                <select id="csvSelector"></select>
-            </div>
-
-            <div id="searchInputsContainer" class="dynamic-inputs"></div>
-            
-            <div>
-                <label>キーワード検索 (全項目対象)</label>
-                <input id="searchInput" type="text" placeholder="名称、効果、キーワードなどを入力..." />
-            </div>
+    <div class="search-controls">
+        <div>
+            <label>検索対象データ</label>
+            <select id="csvSelector"></select>
         </div>
 
-        <h3 style="margin-top: 20px;">検索結果</h3>
-        <div id="searchResultWrapper">
-            <div id="searchResults">
-                <p>キーワードを入力し、検索対象を選択してください。</p>
-            </div>
+        <div id="searchInputsContainer"></div>
+        
+        <div>
+            <label>共通キーワード検索</label>
+            <input id="searchInput" type="text" placeholder="全項目から検索..." />
         </div>
+    </div>
+
+    <div id="searchResultWrapper">
+        <div id="searchResults"></div>
     </div>
 </div>
 
 <script>
-/* --- 検索ロジック (script.jsより) --- */
-
 const CSV_FILE_MAP = {
     'identity': { name: '人格', url: './identity.tsv' },
     'singularidentity': { name: '特異人格', url: './singularidentity.tsv' },
@@ -167,153 +142,152 @@ const CSV_FILE_MAP = {
     'item': { name: 'アイテム', url: './item.tsv' } 
 };
 
-// 各データ固有の検索フィールド定義
 const SEARCH_FIELDS = {
     'identity': [
-        { id: 'search_id_no', label: '番号', type: 'text', csvKey: '番号' },
-        { id: 'search_id_name', label: '名称', type: 'text', csvKey: '名称' }
+        { id: 'f_no', label: '番号', type: 'text', csvKey: '番号' },
+        { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' }
+    ],
+    'singularidentity': [
+        { id: 'f_no', label: '番号', type: 'text', csvKey: '番号' },
+        { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' }
     ],
     'suppassive': [
-        { id: 'search_sp_type', label: '通常/死亡', type: 'select', options: ['', '通常', '死亡'], csvKey: '種別' },
-        { id: 'search_sp_resource', label: '資源', type: 'select', options: ['', '憤怒', '色欲','怠惰','暴食','憂鬱','傲慢','嫉妬','なし'], csvKey:'資源' },
-        { id: 'search_sp_ownership', label: '保有/共鳴', type: 'select', options: ['', '保有', '共鳴','なし'], csvKey: '保有・共鳴' },
-        { id: 'search_sp_price', label: '価格', type: 'text', csvKey: '価格' }
+        { id: 'f_type', label: '通常/死亡', type: 'select', options: ['', '通常', '死亡'], csvKey: '種別' },
+        { id: 'f_res', label: '資源', type: 'select', options: ['', '憤怒', '色欲','怠惰','暴食','憂鬱','傲慢','嫉妬','なし'], csvKey: '資源' },
+        { id: 'f_own', label: '保有/共鳴', type: 'select', options: ['', '保有', '共鳴','なし'], csvKey: '保有・共鳴' },
+        { id: 'f_price', label: '価格 (以下)', type: 'number', csvKey: '価格' }
     ],
-    'mental': [{ id: 'search_me_name', label: '名称', type: 'text', csvKey: '名称' }],
+    'mental': [
+        { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
+        { id: 'f_price', label: '価格 (以下)', type: 'number', csvKey: '価格' }
+    ],
     'ego': [
-        { id: 'search_ego_name', label: '名称', type: 'text', csvKey: '名称' },
-        { id: 'search_ego_type', label: '種別', type: 'text', csvKey: '種別' }
+        { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
+        { id: 'f_rank', label: '危険度', type: 'select', options: ['', 'ZAYIN', 'TETH', 'HE', 'WAW', 'ALEPH'], csvKey: '危険度' },
+        { id: 'f_price', label: '価格 (以下)', type: 'number', csvKey: '価格' }
     ],
-    'status': [{ id: 'search_st_name', label: '名称', type: 'text', csvKey: '名称' }],
-    'item': [{ id: 'search_it_name', label: '名称', type: 'text', csvKey: '名称' }]
+    'status': [
+        { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
+        { id: 'f_cat', label: '分類', type: 'select', options: ['', 'バフ', '中立バフ', 'デバフ', '蓄積要素', '弾丸', '特殊', '固有'], csvKey: '分類' }
+    ],
+    'item': [
+        { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
+        { id: 'f_cat', label: '分類', type: 'select', options: ['', '特殊', '回復', '強化'], csvKey: '分類' }
+    ]
 };
 
-const searchButton = document.getElementById('searchButton');
-const searchModal = document.getElementById('searchModal');
-const closeBtn = document.querySelector('.close-btn');
 const csvSelector = document.getElementById('csvSelector');
 const searchInput = document.getElementById('searchInput');
 const searchInputsContainer = document.getElementById('searchInputsContainer');
 const searchResults = document.getElementById('searchResults');
 
-let currentSearchData = [];
-let dataCache = {};
+let currentData = [];
+let cache = {};
 
-// 初期化：セレクターの生成
-Object.keys(CSV_FILE_MAP).forEach(key => {
+// 初期ロード
+Object.keys(CSV_FILE_MAP).forEach(k => {
     const opt = document.createElement('option');
-    opt.value = key;
-    opt.textContent = CSV_FILE_MAP[key].name;
+    opt.value = k; opt.textContent = CSV_FILE_MAP[k].name;
     csvSelector.appendChild(opt);
 });
 
-// TSVのパース
-function parseTsv(text) {
-    const lines = text.trim().split(/\r?\n/);
-    const headers = lines[0].split('\t').map(h => h.trim());
-    return lines.slice(1).map(line => {
-        const values = line.split('\t');
-        const obj = {};
-        headers.forEach((h, i) => obj[h] = values[i] ? values[i].trim() : '');
-        return obj;
-    });
-}
-
-// データのロード
-async function loadSearchData(key) {
-    if (!dataCache[key]) {
-        try {
-            const res = await fetch(CSV_FILE_MAP[key].url);
-            const text = await res.text();
-            dataCache[key] = parseTsv(text);
-        } catch (e) {
-            console.error("データロード失敗:", e);
-            return [];
-        }
+async function loadData() {
+    const key = csvSelector.value;
+    if (!cache[key]) {
+        const res = await fetch(CSV_FILE_MAP[key].url);
+        const text = await res.text();
+        const lines = text.trim().split(/\r?\n/);
+        const headers = lines[0].split('\t').map(h => h.trim());
+        cache[key] = lines.slice(1).map(line => {
+            const cols = line.split('\t');
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = cols[i] ? cols[i].trim() : '');
+            return obj;
+        });
     }
-    return dataCache[key];
+    currentData = cache[key];
+    renderFields(key);
+    performSearch();
 }
 
-// 固有検索項目の生成
-function renderDynamicInputs(key) {
+function renderFields(key) {
     searchInputsContainer.innerHTML = '';
-    const fields = SEARCH_FIELDS[key] || [];
-    fields.forEach(f => {
+    SEARCH_FIELDS[key].forEach(f => {
         const div = document.createElement('div');
         div.className = 'search-input-group';
         div.innerHTML = `<label>${f.label}</label>`;
-        
-        let input;
+        const input = document.createElement(f.type === 'select' ? 'select' : 'input');
+        if (f.type !== 'select') input.type = f.type;
         if (f.type === 'select') {
-            input = document.createElement('select');
             f.options.forEach(o => {
                 const opt = document.createElement('option');
                 opt.value = o; opt.textContent = o || 'すべて';
                 input.appendChild(opt);
             });
-        } else {
-            input = document.createElement('input');
-            input.type = 'text';
-            input.placeholder = `${f.label}で検索...`;
         }
         input.id = f.id;
-        input.addEventListener('input', () => performSearch());
+        input.addEventListener('input', performSearch);
         div.appendChild(input);
         searchInputsContainer.appendChild(div);
     });
 }
 
-// 検索実行
 function performSearch() {
     const query = searchInput.value.toLowerCase();
-    const selectedKey = csvSelector.value;
-    const fields = SEARCH_FIELDS[selectedKey] || [];
+    const key = csvSelector.value;
+    const fields = SEARCH_FIELDS[key];
+    
+    // 入力チェック（何も入力されていなければ空にする）
+    const hasInput = query || fields.some(f => {
+        const el = document.getElementById(f.id);
+        return el && el.value !== '';
+    });
 
-    const filtered = currentSearchData.filter(item => {
-        // キーワード検索（全項目）
+    if (!hasInput) {
+        searchResults.innerHTML = '';
+        return;
+    }
+
+    const filtered = currentData.filter(item => {
         const keywordMatch = Object.values(item).some(v => String(v).toLowerCase().includes(query));
-        
-        // 固有項目フィルタ
         const dynamicMatch = fields.every(f => {
             const el = document.getElementById(f.id);
-            if (!el || !el.value) return true;
-            return String(item[f.csvKey]).toLowerCase().includes(el.value.toLowerCase());
+            if (!el || el.value === '') return true;
+            const val = item[f.csvKey];
+            if (f.type === 'number') return Number(val) <= Number(el.value);
+            return String(val).toLowerCase().includes(el.value.toLowerCase());
         });
-
         return keywordMatch && dynamicMatch;
     });
 
-    displayResults(filtered);
+    renderResults(filtered);
 }
 
-function displayResults(data) {
+function renderResults(data) {
     if (data.length === 0) {
-        searchResults.innerHTML = '<p>該当するデータがありません。</p>';
+        searchResults.innerHTML = '<p style="text-align:center; color:var(--muted);">一致するデータがありません</p>';
         return;
     }
-    searchResults.innerHTML = data.map(item => `
-        <div class="search-result-item">
-            ${Object.entries(item).map(([k, v]) => v ? `<div><strong>${k}:</strong> ${v}</div>` : '').join('')}
-        </div>
-    `).join('');
+    searchResults.innerHTML = data.map(item => {
+        const textToCopy = Object.entries(item).map(([k,v]) => `${k}: ${v}`).join('\n');
+        return `
+            <div class="search-result-item">
+                <button class="copy-btn" onclick="copyText(\`${textToCopy.replace(/`/g, '\\`')}\`)">コピー</button>
+                ${Object.entries(item).map(([k, v]) => v ? `<div><strong>${k}:</strong> ${v}</div>` : '').join('')}
+            </div>
+        `;
+    }).join('');
 }
 
-// イベント設定
-searchButton.onclick = async () => {
-    searchModal.style.display = 'flex';
-    currentSearchData = await loadSearchData(csvSelector.value);
-    renderDynamicInputs(csvSelector.value);
-    performSearch();
-};
+function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert('クリップボードにコピーしました');
+    });
+}
 
-closeBtn.onclick = () => searchModal.style.display = 'none';
-csvSelector.onchange = async () => {
-    currentSearchData = await loadSearchData(csvSelector.value);
-    renderDynamicInputs(csvSelector.value);
-    performSearch();
-};
-searchInput.oninput = () => performSearch();
-window.onclick = (e) => { if(e.target == searchModal) searchModal.style.display = 'none'; };
+csvSelector.onchange = loadData;
+searchInput.oninput = performSearch;
+window.onload = loadData;
 </script>
 
 </body>
