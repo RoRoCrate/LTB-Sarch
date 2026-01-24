@@ -2,24 +2,8 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta charset="UTF-8">
-<title>リンバスTRPG　死期式としょんか</title>
-<link rel="icon" href="favicon.ico">
-<link rel="icon" href="/path/to/favicon.ico">
-  <!-- OGP基本情報 -->
-  <meta property="og:title" content="リンバスTRPG　死期式としょんか">
-  <meta property="og:description" content="このサイトは @limbustrpg 様制作TRPGシステムの非公式データベースです>
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://rorocrate.github.io/Limbus-TRPG-Sheet/">
-  <meta property="og:image" content="https://rorocrate.github.io/Limbus-TRPG-Sheet/og-image.png">
-
-    <!-- Twitterカード用 -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="リンバスTRPG　死期式としょんか">
-  <meta name="twitter:description" content="このサイトは @limbustrpg 様制作TRPGシステムの非公式データベースです>
-  <meta name="twitter:image" content="https://rorocrate.github.io/Limbus-TRPG-Sheet/og-image.png">
-
-    <title>リンバスTRPG　死期式としょんか</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Search Tool</title>
     <style>
         :root {
             --bg: #071121;
@@ -36,32 +20,57 @@
             margin: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* スマホでのスクロールを考慮 */
             min-height: 100vh;
         }
 
         .search-container {
             background: var(--card);
-            padding: 30px;
+            padding: 20px;
             border-radius: var(--radius);
-            width: 95%;
+            width: 100%;
             max-width: 800px;
             border: 1px solid var(--accent);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-            margin: 20px;
+            margin: 10px; /* スマホでの余白 */
+            box-sizing: border-box;
         }
 
-        h2 { text-align: center; color: var(--accent); margin-top: 0; border-bottom: 1px solid #1e203d; padding-bottom: 15px; }
+        h2 { 
+            text-align: center; 
+            color: var(--accent); 
+            margin-top: 0; 
+            font-size: 1.4rem;
+            border-bottom: 1px solid #1e203d; 
+            padding-bottom: 15px; 
+        }
 
-        .search-controls { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
+        .search-controls { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
 
         #searchInputsContainer { display: flex; flex-wrap: wrap; gap: 10px; }
 
-        .search-input-group { width: calc(50% - 5px); box-sizing: border-box; }
+        /* PCでは2列、スマホ(600px以下)では1列 */
+        .search-input-group { 
+            width: calc(50% - 5px); 
+            box-sizing: border-box; 
+        }
+
+        @media (max-width: 600px) {
+            .search-input-group { width: 100%; }
+            h2 { font-size: 1.1rem; }
+            .search-container { padding: 15px; }
+        }
 
         input[type="text"], input[type="number"], select {
-            width: 100%; padding: 10px; background: #1e203d; border: 1px solid #5560aa;
-            color: #fff; border-radius: 6px; box-sizing: border-box; outline: none;
+            width: 100%; 
+            padding: 12px; /* タップしやすく少し太めに */
+            background: #1e203d; 
+            border: 1px solid #5560aa;
+            color: #fff; 
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            outline: none;
+            font-size: 16px; /* iOSのズーム防止のため16px以上を推奨 */
         }
 
         input:focus, select:focus { border-color: var(--accent); }
@@ -69,33 +78,52 @@
         label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; font-weight: bold; }
 
         #searchResultWrapper {
-            margin-top: 25px; max-height: 500px; overflow-y: auto;
-            border-top: 1px solid rgba(255, 255, 255, 0.1); padding-top: 15px;
+            margin-top: 20px; 
+            max-height: 60vh; /* スマホ画面に合わせて高さを調整 */
+            overflow-y: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.1); 
+            padding-top: 15px;
         }
 
         .result-item {
-            background: rgba(255, 255, 255, 0.03); padding: 15px; margin-bottom: 12px;
-            border-radius: 8px; border-left: 4px solid var(--accent);
+            background: rgba(255, 255, 255, 0.03); 
+            padding: 15px; 
+            margin-bottom: 12px;
+            border-radius: 8px; 
+            border-left: 4px solid var(--accent);
             position: relative;
         }
 
         .copy-btn {
-            position: absolute; right: 10px; top: 10px;
-            background: var(--accent); color: #000; border: none;
-            padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: bold;
+            position: absolute; 
+            right: 8px; 
+            top: 8px;
+            background: var(--accent); 
+            color: #000; 
+            border: none;
+            padding: 8px 16px; /* スマホで押しやすいサイズ */
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 0.75rem; 
+            font-weight: bold;
+            z-index: 10;
         }
 
-        .field { margin-bottom: 4px; font-size: 0.9rem; line-height: 1.4; display: flex; }
-        .field-label { color: var(--accent); font-weight: bold; min-width: 110px; margin-right: 8px; }
-        .field-value { flex: 1; }
+        .field { margin-bottom: 6px; font-size: 0.9rem; line-height: 1.5; display: flex; flex-direction: column; }
+        .field-label { color: var(--accent); font-weight: bold; font-size: 0.75rem; margin-bottom: 1px; }
+        .field-value { flex: 1; word-break: break-all; } /* 長いテキストの改行対策 */
 
-        @media (max-width: 600px) { .search-input-group { width: 100%; } }
+        /* 検索結果のラベルと値の並びをスマホで見やすく */
+        @media (min-width: 601px) {
+            .field { flex-direction: row; }
+            .field-label { min-width: 110px; margin-right: 8px; font-size: 0.9rem; }
+        }
     </style>
 </head>
 <body>
 
 <div class="search-container">
-    <h2>LTB検索データベース</h2>
+    <h2>DATABASE ARCHIVE</h2>
 
     <div class="search-controls">
         <div>
@@ -106,7 +134,7 @@
         <div id="searchInputsContainer"></div>
         
         <div>
-            <label>キーワード</label>
+            <label>共通キーワード (全項目対象)</label>
             <input id="searchInput" type="text" placeholder="キーワードを入力..." />
         </div>
     </div>
@@ -131,32 +159,32 @@
 
     const SEARCH_FIELDS = {
         'identity': [
-            { id: 'f_no', label: '番号', type: 'text', csvKey: '番号' },
+            { id: 'f_no', label: '番号 (完全一致)', type: 'text', csvKey: '番号' },
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' }
         ],
         'singularidentity': [
-            { id: 'f_no', label: '番号', type: 'text', csvKey: '番号' },
+            { id: 'f_no', label: '番号 (完全一致)', type: 'text', csvKey: '番号' },
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' }
         ],
         'suppassive': [
             { id: 'f_type', label: '種別', type: 'select', options: ['', '通常', '死亡'], csvKey: '種別' },
             { id: 'f_res', label: '資源', type: 'select', options: ['', '憤怒', '色欲','怠惰','暴食','憂鬱','傲慢','嫉妬','なし'], csvKey: '資源' },
             { id: 'f_own', label: '発動条件', type: 'select', options: ['', '保有', '共鳴','なし'], csvKey: '保有・共鳴' },
-            { id: 'f_price', label: '価格', type: 'number', csvKey: '価格' }
+            { id: 'f_price', label: '価格以下', type: 'number', csvKey: '価格' }
         ],
         'mental': [
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
-            { id: 'f_price', label: '価格', type: 'number', csvKey: '価格' }
+            { id: 'f_price', label: '価格以下', type: 'number', csvKey: '価格' }
         ],
         'ego': [
             { id: 'f_no', label: '番号 (完全一致)', type: 'text', csvKey: '番号' },
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
             { id: 'f_rank', label: '危険度', type: 'select', options: ['', 'ZAYIN', 'TETH', 'HE', 'WAW', 'ALEPH'], csvKey: '危険度' },
-            { id: 'f_price', label: '価格', type: 'number', csvKey: '価格' }
+            { id: 'f_price', label: '価格以下', type: 'number', csvKey: '価格' }
         ],
         'status': [
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
-            { id: 'f_cat', label: '分類', type: 'select', options: ['', 'バフ', '中立バフ', 'デバフ', '蓄積要素', '弾丸', '特殊'], csvKey: '分類' }
+            { id: 'f_cat', label: '分類', type: 'select', options: ['', 'バフ', '中立バフ', 'デバフ', '蓄積要素', '弾丸', '特殊', '固有'], csvKey: '分類' }
         ],
         'item': [
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
@@ -246,17 +274,8 @@
                 if (!el || el.value === '') return true;
                 const val = item[f.csvKey];
 
-                // 番号検索 (f_no) の場合は完全一致
-                if (f.id === 'f_no') {
-                    return String(val) === String(el.value);
-                }
-                
-                // 価格検索の場合は数値比較
-                if (f.type === 'number') {
-                    return val !== '' && Number(val) <= Number(el.value);
-                }
-
-                // その他は部分一致
+                if (f.id === 'f_no') return String(val) === String(el.value);
+                if (f.type === 'number') return val !== '' && Number(val) <= Number(el.value);
                 return String(val).toLowerCase().includes(el.value.toLowerCase());
             });
             return keywordMatch && dynamicMatch;
@@ -273,7 +292,7 @@
         searchResults.innerHTML = data.map((item, idx) => {
             const htmlFields = Object.entries(item).map(([k, v]) => {
                 if(!v) return '';
-                return `<div class="field"><span class="field-label">${k}:</span><span class="field-value">${v}</span></div>`;
+                return `<div class="field"><span class="field-label">${k}</span><span class="field-value">${v}</span></div>`;
             }).join('');
 
             return `
@@ -293,7 +312,7 @@
         const textToCopy = Array.from(fields).map(f => {
             const label = f.querySelector('.field-label').innerText;
             const value = f.querySelector('.field-value').innerText;
-            return `${label} ${value}`;
+            return `${label}: ${value}`; // コピー時は読みやすくコロンを追加
         }).join('\n');
 
         try {
@@ -317,6 +336,3 @@
 
 </body>
 </html>
-
-
-
