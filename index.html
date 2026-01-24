@@ -2,750 +2,319 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>リンバスTRPG キャラクターシートメーカー</title>
-<link rel="icon" href="favicon.ico">
-<link rel="icon" href="/path/to/favicon.ico">
-  <!-- OGP基本情報 -->
-  <meta property="og:title" content="リンバスTRPG キャラクターシートメーカー">
-  <meta property="og:description" content="このサイトは @limbustrpg 様のTRPGシステム用の非公式キャラクターシートメーカーです>
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://rorocrate.github.io/Limbus-TRPG-Sheet/">
-  <meta property="og:image" content="https://rorocrate.github.io/Limbus-TRPG-Sheet/og-image.png">
+<title>データベース検索ツール</title>
+<style>
+/* --- root変数と基本スタイル (style.cssより) --- */
+:root {
+    --bg: #071121;
+    --card: #0b1220;
+    --muted: #9aa6b2;
+    --accent: #60a5fa;
+    --glass: rgba(255, 255, 255, 0.03);
+    --radius: 12px;
+    font-family: 'Noto Sans JP', sans-serif;
+}
 
-    <!-- Twitterカード用 -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="リンバスTRPG キャラクターシートメーカー">
-  <meta name="twitter:description" content="このサイトは @limbustrpg 様のTRPGシステム用の非公式キャラクターシートメーカーです。>
-  <meta name="twitter:image" content="https://rorocrate.github.io/Limbus-TRPG-Sheet/og-image.png">
+body {
+    background-color: var(--bg);
+    color: #fff;
+    margin: 20px;
+}
 
-  
-<link rel="stylesheet" href="style.css">
+.btn {
+    padding: 10px 20px;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* --- 検索モーダルのスタイル --- */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 10000;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background: var(--card);
+    padding: 24px;
+    border-radius: var(--radius);
+    width: 90%;
+    max-width: 750px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border: 1px solid var(--accent);
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    right: 15px; top: 15px;
+    font-size: 28px;
+    color: var(--muted);
+    cursor: pointer;
+}
+
+/* --- 検索フォームのレイアウト --- */
+.search-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#searchInputsContainer {
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 10px;
+}
+
+.search-input-group {
+    width: calc(50% - 5px);
+    box-sizing: border-box;
+}
+
+input[type="text"], select {
+    width: 100%;
+    padding: 10px;
+    background: #1e203d;
+    border: 1px solid #5560aa;
+    color: #fff;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+
+label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+}
+
+/* --- 検索結果のスタイル --- */
+#searchResultWrapper {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.search-result-item {
+    background-color: rgba(255, 255, 255, 0.03);
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border-left: 4px solid var(--accent);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.search-result-item strong {
+    color: var(--accent);
+}
+</style>
 </head>
 <body>
-<main style="display:flex; gap:12px;">
-<section style="flex:2;">
-  <header>
-    <h1>LimbusTRPG キャラクターシート</h1>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button id="clearBtn" type="button" class="btn ghost">フォームをクリア</button>
-      <button id="saveBtn" class="btn">ローカル保存</button>
-      <button id="printBtn" class="btn">印刷 / PDF</button>
-      <button id="downloadBtn" class="btn">テキストとして保存</button>
-    </div>
 
-    
-  </header>
+<button id="searchButton" class="btn">データ検索を開く</button>
 
-  
+<div id="searchModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn">&times;</span>
+        <h2 style="margin-top:0;">データベース検索</h2>
 
-  <div id="pageTopBtn">▲ TOP</div>
+        <div class="search-controls">
+            <div>
+                <label>検索対象データ</label>
+                <select id="csvSelector"></select>
+            </div>
 
-  <button id="searchButton" class="btn">データ検索</button>
-
- <div id="searchModal" class="modal">
-  <div class="modal-content">
-    <span class="close-btn">&times;</span>
-    <h2>データ検索</h2>
-
-    <div class="search-controls">
-      <label>検索対象データ</label>
-      <select id="csvSelector"></select>
-
-      <div id="searchInputsContainer" class="dynamic-inputs">
-        </div>
-      
-      <label style="margin-top:12px;">キーワード検索 (全項目対象)</label>
-      <input id="searchInput" type="text" placeholder="名称、番号、効果、資源などを検索..." style="width:100%;" />
-    </div>
-
-  <h3 style="margin-top: 20px;">検索結果</h3>
-    
-    <div id="searchResultWrapper" style="max-height: 400px; overflow-y: auto; padding: 10px; border: 1px solid var(--accent); border-radius: 8px; background-color: rgba(0, 0, 0, 0.2);">
-        <div id="searchResults">
-            <p>キーワードを入力し、検索対象を選択してください。</p>
-        </div>
-    </div>
-  </div>
-</div>
-
-
-  
-    <main class="container">
-    <section>
-
-      <form id="sheetForm" class="card" autocomplete="off"　autocomplete="off" onsubmit="return false;">
-        <div class="row">
-          <div class="col">
-            <label>PC 名</label>
-            <input id="pcName" type="text" placeholder="PC名を入力" />
-          </div>
-          <div style="width:220px">
-            <label>PL 名</label>
-            <input id="plName" type="text" placeholder="PL名を入力" />
-          </div>
+            <div id="searchInputsContainer" class="dynamic-inputs"></div>
+            
+            <div>
+                <label>キーワード検索 (全項目対象)</label>
+                <input id="searchInput" type="text" placeholder="名称、効果、キーワードなどを入力..." />
+            </div>
         </div>
 
-        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.04)">
-
-        <div>
-  <label>【ステータス】</label>
-  <div class="stat-grid" style="margin-top:8px">
-
-    <div class="stat">
-      <label>人格</label>
-      <input id="persona" type="text" />
+        <h3 style="margin-top: 20px;">検索結果</h3>
+        <div id="searchResultWrapper">
+            <div id="searchResults">
+                <p>キーワードを入力し、検索対象を選択してください。</p>
+            </div>
+        </div>
     </div>
-
-    <div class="stat">
-      <label>HP</label>
-      <input id="hp" type="number" min="0" />
-    </div>
-
-    <div class="stat">
-      <label>SAN</label>
-      <input id="san" type="number" min="0" />
-    </div>
-
-    <div class="stat">
-      <label>速度（nDn）</label>
-      <input id="speed" type="text" placeholder="例: 1d3" />
-
-    </div>
-
-    <div class="stat">
-      <label>斬撃</label>
-      <select id="slash">
-        <option value="抵抗">抵抗</option>
-        <option value="普通" selected>普通</option>
-        <option value="弱点">弱点</option>
-      </select>
-    </div>
-
-    <div class="stat">
-      <label>貫通</label>
-      <select id="pierce">
-        <option value="抵抗">抵抗</option>
-        <option value="普通" selected>普通</option>
-        <option value="弱点">弱点</option>
-      </select>
-    </div>
-
-    <div class="stat">
-      <label>打撃</label>
-      <select id="blunt">
-        <option value="抵抗">抵抗</option>
-        <option value="普通" selected>普通</option>
-        <option value="弱点">弱点</option>
-      </select>
-    </div>
-
-    <div class="stat">
-      <label>精神</label>
-      <input id="mind" type="text" />
-    </div>
-
-  </div>
-  
-  <div style="margin-top: 12px;">
-    <label>精神効果</label>
-    <textarea id="mind_effect" placeholder="精神効果を記入"></textarea>
-  </div>
-  </div>
-
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.04)">
-
-        <div>
-  <label>【パッシブ】</label>
-  <div class="stat-grid" style="margin-top:8px">
-    <div class="stat">
-      <label>パッシブ名</label>
-      <input id="passive_name" type="text" />
-    </div>
-
-    <div class="stat">
-      <label>発動条件</label>
-      <input id="passive_condition" type="text" />
-    </div>
-
-    <div class="stat" style="grid-column: span 2;">
-      <label>効果</label>
-      <textarea id="passive_effect" style="width:100%; height:60px;"></textarea>
-    </div>
-  </div>
-</div>
-<div style="margin-top:16px;">
-  <label>【サポートパッシブ】</label>
-
-  <!-- ▼ 1枠目 -->
-
-  <div class="stat-grid" style="margin-bottom:10px;">
-    <div class="stat">
-      <label>1：サポート名</label>
-      <input id="sup1_name" type="text">
-    </div>
-    <div class="stat">
-      <label>発動条件</label>
-      <input id="sup1_condition" type="text">
-    </div>
-    <div class="stat" style="grid-column: span 2;">
-      <label>効果</label>
-      <textarea id="sup1_effect" style="width:100%;height:60px;"></textarea>
-    </div>
-  </div>
-
-  <!-- ▼ 2枠目 -->
-
-  <div class="stat-grid" style="margin-bottom:10px;">
-    <div class="stat">
-      <label>2：サポート名</label>
-      <input id="sup2_name" type="text">
-    </div>
-    <div class="stat">
-      <label>発動条件</label>
-      <input id="sup2_condition" type="text">
-    </div>
-    <div class="stat" style="grid-column: span 2;">
-      <label>効果</label>
-      <textarea id="sup2_effect" style="width:100%;height:60px;"></textarea>
-    </div>
-  </div>
-
-  <!-- ▼ 3枠目：チェックで表示 -->
-
-  <label style="margin-top:8px; display:block;">
-    <input type="checkbox" id="sup3_enable"> 3枠目を使用する
-  </label>
-
-  <div id="sup3_wrapper" style="display:none; margin-top:8px;">
-    <div class="stat-grid">
-      <div class="stat">
-        <label>3：サポート名</label>
-        <input id="sup3_name" type="text">
-      </div>
-      <div class="stat">
-        <label>発動条件</label>
-        <input id="sup3_condition" type="text">
-      </div>
-      <div class="stat" style="grid-column: span 2;">
-        <label>効果</label>
-        <textarea id="sup3_effect" style="width:100%;height:60px;"></textarea>
-      </div>
-    </div>
-  </div>
 </div>
 
+<script>
+/* --- 検索ロジック (script.jsより) --- */
 
-   <!-- 死亡後パッシブ -->
+const CSV_FILE_MAP = {
+    'identity': { name: '人格', url: './identity.tsv' },
+    'singularidentity': { name: '特異人格', url: './singularidentity.tsv' },
+    'suppassive': { name: 'サポートパッシブ', url: './suppassive.tsv' },
+    'mental': { name: '精神', url: './mental.tsv' },
+    'ego': { name: 'E.G.O', url: './ego.tsv' },
+    'status': { name: '状態異常', url: './status.tsv' },
+    'item': { name: 'アイテム', url: './item.tsv' } 
+};
 
-<div style="margin-top:16px;">
-  <label>
-    <input type="checkbox" id="deathpassive_enable">
-    死亡後パッシブ所持
-  </label>
+// 各データ固有の検索フィールド定義
+const SEARCH_FIELDS = {
+    'identity': [
+        { id: 'search_id_no', label: '番号', type: 'text', csvKey: '番号' },
+        { id: 'search_id_name', label: '名称', type: 'text', csvKey: '名称' }
+    ],
+    'suppassive': [
+        { id: 'search_sp_type', label: '通常/死亡', type: 'select', options: ['', '通常', '死亡'], csvKey: '種別' },
+        { id: 'search_sp_resource', label: '資源', type: 'select', options: ['', '憤怒', '色欲','怠惰','暴食','憂鬱','傲慢','嫉妬','なし'], csvKey:'資源' },
+        { id: 'search_sp_ownership', label: '保有/共鳴', type: 'select', options: ['', '保有', '共鳴','なし'], csvKey: '保有・共鳴' },
+        { id: 'search_sp_price', label: '価格', type: 'text', csvKey: '価格' }
+    ],
+    'mental': [{ id: 'search_me_name', label: '名称', type: 'text', csvKey: '名称' }],
+    'ego': [
+        { id: 'search_ego_name', label: '名称', type: 'text', csvKey: '名称' },
+        { id: 'search_ego_type', label: '種別', type: 'text', csvKey: '種別' }
+    ],
+    'status': [{ id: 'search_st_name', label: '名称', type: 'text', csvKey: '名称' }],
+    'item': [{ id: 'search_it_name', label: '名称', type: 'text', csvKey: '名称' }]
+};
 
-  <div id="deathpassive_wrapper" style="display:none; margin-top:8px;">
-    <div class="stat-grid">
-      <div class="stat">
-        <label>死亡後パッシブ名</label>
-        <input id="deathp_name" type="text">
-      </div>
-      <div class="stat">
-        <label>発動条件</label>
-        <input id="deathp_condition" type="text">
-      </div>
-      <div class="stat" style="grid-column: span 2;">
-        <label>効果</label>
-        <textarea id="deathp_effect" style="width:100%; height:60px;"></textarea>
-      </div>
-    </div>
-  </div>
-</div>
+const searchButton = document.getElementById('searchButton');
+const searchModal = document.getElementById('searchModal');
+const closeBtn = document.querySelector('.close-btn');
+const csvSelector = document.getElementById('csvSelector');
+const searchInput = document.getElementById('searchInput');
+const searchInputsContainer = document.getElementById('searchInputsContainer');
+const searchResults = document.getElementById('searchResults');
 
-<div style="margin-top:8px"> 
-  <label>【戦術】</label>
-  <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px">
-<style>
-.tactic-block {
-  display: flex;
-  flex-direction: column;
-  gap: 4px; 
-  margin-bottom: 8px;
+let currentSearchData = [];
+let dataCache = {};
+
+// 初期化：セレクターの生成
+Object.keys(CSV_FILE_MAP).forEach(key => {
+    const opt = document.createElement('option');
+    opt.value = key;
+    opt.textContent = CSV_FILE_MAP[key].name;
+    csvSelector.appendChild(opt);
+});
+
+// TSVのパース
+function parseTsv(text) {
+    const lines = text.trim().split(/\r?\n/);
+    const headers = lines[0].split('\t').map(h => h.trim());
+    return lines.slice(1).map(line => {
+        const values = line.split('\t');
+        const obj = {};
+        headers.forEach((h, i) => obj[h] = values[i] ? values[i].trim() : '');
+        return obj;
+    });
 }
 
-.tactic-block textarea {
-  height: 60px; 
-  resize: vertical;
+// データのロード
+async function loadSearchData(key) {
+    if (!dataCache[key]) {
+        try {
+            const res = await fetch(CSV_FILE_MAP[key].url);
+            const text = await res.text();
+            dataCache[key] = parseTsv(text);
+        } catch (e) {
+            console.error("データロード失敗:", e);
+            return [];
+        }
+    }
+    return dataCache[key];
 }
 
-.tactic-block label {
-  margin-top: 0; 
+// 固有検索項目の生成
+function renderDynamicInputs(key) {
+    searchInputsContainer.innerHTML = '';
+    const fields = SEARCH_FIELDS[key] || [];
+    fields.forEach(f => {
+        const div = document.createElement('div');
+        div.className = 'search-input-group';
+        div.innerHTML = `<label>${f.label}</label>`;
+        
+        let input;
+        if (f.type === 'select') {
+            input = document.createElement('select');
+            f.options.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o; opt.textContent = o || 'すべて';
+                input.appendChild(opt);
+            });
+        } else {
+            input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = `${f.label}で検索...`;
+        }
+        input.id = f.id;
+        input.addEventListener('input', () => performSearch());
+        div.appendChild(input);
+        searchInputsContainer.appendChild(div);
+    });
 }
 
-.tactic-block select,
-.tactic-block input {
-  width: 100%;
-  box-sizing: border-box;
+// 検索実行
+function performSearch() {
+    const query = searchInput.value.toLowerCase();
+    const selectedKey = csvSelector.value;
+    const fields = SEARCH_FIELDS[selectedKey] || [];
+
+    const filtered = currentSearchData.filter(item => {
+        // キーワード検索（全項目）
+        const keywordMatch = Object.values(item).some(v => String(v).toLowerCase().includes(query));
+        
+        // 固有項目フィルタ
+        const dynamicMatch = fields.every(f => {
+            const el = document.getElementById(f.id);
+            if (!el || !el.value) return true;
+            return String(item[f.csvKey]).toLowerCase().includes(el.value.toLowerCase());
+        });
+
+        return keywordMatch && dynamicMatch;
+    });
+
+    displayResults(filtered);
 }
-</style>
 
-<div class="tactic-block">
-  <label>0：</label>
-  <input id="t0_name" type="text" placeholder="戦術名" />
-
-<label>守備属性</label> <select id="t0_guard"> <option value="">選択</option> <option value="防御">防御</option> <option value="回避">回避</option> <option value="反撃">反撃</option> </select>
-
-<label>攻撃属性</label> <select id="t0_attr"> <option value="なし">なし</option> <option value="斬撃">斬撃</option> <option value="貫通">貫通</option> <option value="打撃">打撃</option> </select>
-
-<label>罪</label> <select id="t0_sin"> <option value="">選択</option> <option value="憤怒">憤怒</option> <option value="色欲">色欲</option> <option value="怠惰">怠惰</option> <option value="暴食">暴食</option> <option value="憂鬱">憂鬱</option> <option value="傲慢">傲慢</option> <option value="嫉妬">嫉妬</option> </select>
-
-<label>マッチ処理</label> <select id="t0_match"> <option value="不可">不可</option> <option value="可能">可能</option> </select>
-
-<label>効果</label>
-
-  <textarea id="t0_effect" placeholder="（効果）"></textarea>
-
-</div>
-
-</div>
-    <!-- 戦術 1〜4：攻撃属性 -->
-
-    <!-- 戦術 1 -->
-    <div class="tactic-block">
-      <label>1：</label>
-      <input id="t1_name" type="text" placeholder="戦術名" />
-
-      <label style="margin-top:6px">攻撃属性</label>
-      <select id="t1_attr">
-        <option value="">選択</option>
-        <option value="斬撃">斬撃</option>
-        <option value="貫通">貫通</option>
-        <option value="打撃">打撃</option>
-      </select>
-
-      <label style="margin-top:6px">罪</label>
-      <select id="t1_sin">
-        <option value="">選択</option>
-        <option value="憤怒">憤怒</option>
-        <option value="色欲">色欲</option>
-        <option value="怠惰">怠惰</option>
-        <option value="暴食">暴食</option>
-        <option value="憂鬱">憂鬱</option>
-        <option value="傲慢">傲慢</option>
-        <option value="嫉妬">嫉妬</option>
-      </select>
-
-      <label style="margin-top:6px">効果</label>
-      <textarea id="t1_effect" placeholder="（効果）"></textarea>
-    </div>
-
-    <!-- 戦術 2 -->
-    <div class="tactic-block">
-      <label>2：</label>
-      <input id="t2_name" type="text" placeholder="戦術名" />
-
-      <label style="margin-top:6px">攻撃属性</label>
-      <select id="t2_attr">
-        <option value="">選択</option>
-        <option value="斬撃">斬撃</option>
-        <option value="貫通">貫通</option>
-        <option value="打撃">打撃</option>
-      </select>
-
-      <label style="margin-top:6px">罪</label>
-      <select id="t2_sin">
-        <option value="">選択</option>
-        <option value="憤怒">憤怒</option>
-        <option value="色欲">色欲</option>
-        <option value="怠惰">怠惰</option>
-        <option value="暴食">暴食</option>
-        <option value="憂鬱">憂鬱</option>
-        <option value="傲慢">傲慢</option>
-        <option value="嫉妬">嫉妬</option>
-      </select>
-
-      <label style="margin-top:6px">効果</label>
-      <textarea id="t2_effect" placeholder="（効果）"></textarea>
-    </div>
-
-    <!-- 戦術 3 -->
-    <div class="tactic-block">
-      <label>3：</label>
-      <input id="t3_name" type="text" placeholder="戦術名" />
-
-      <label style="margin-top:6px">攻撃属性</label>
-      <select id="t3_attr">
-        <option value="">選択</option>
-        <option value="斬撃">斬撃</option>
-        <option value="貫通">貫通</option>
-        <option value="打撃">打撃</option>
-      </select>
-
-      <label style="margin-top:6px">罪</label>
-      <select id="t3_sin">
-        <option value="">選択</option>
-        <option value="憤怒">憤怒</option>
-        <option value="色欲">色欲</option>
-        <option value="怠惰">怠惰</option>
-        <option value="暴食">暴食</option>
-        <option value="憂鬱">憂鬱</option>
-        <option value="傲慢">傲慢</option>
-        <option value="嫉妬">嫉妬</option>
-      </select>
-      
-      <label style="margin-top:6px">効果</label>
-      <textarea id="t3_effect" placeholder="（効果）"></textarea>
-    </div>
-
-    <!-- 戦術 4 -->
-    <div class="tactic-block">
-      <label>4：</label>
-      <input id="t4_name" type="text" placeholder="戦術名" />
-
-      <label style="margin-top:6px">攻撃属性</label>
-      <select id="t4_attr">
-        <option value="">選択</option>
-        <option value="斬撃">斬撃</option>
-        <option value="貫通">貫通</option>
-        <option value="打撃">打撃</option>
-      </select>
-
-      <label style="margin-top:6px">罪</label>
-      <select id="t4_sin">
-        <option value="">選択</option>
-        <option value="憤怒">憤怒</option>
-        <option value="色欲">色欲</option>
-        <option value="怠惰">怠惰</option>
-        <option value="暴食">暴食</option>
-        <option value="憂鬱">憂鬱</option>
-        <option value="傲慢">傲慢</option>
-        <option value="嫉妬">嫉妬</option>
-      </select>
-
-      <label style="margin-top:6px">効果</label>
-      <textarea id="t4_effect" placeholder="（効果）"></textarea>
-    </div>
-  </div>
-
-  <div style="margin-top:16px;">
-  <label>
-    <input type="checkbox" id="extraTactics_enable">
-    追加戦術欄を使用
-  </label>
-
-    <div id="extraTacticsCountContainer" style="display:none; margin-top:6px;">
-    <label>所持追加戦術数</label>
-    <input id="extraTacticsCount" type="number" min="0" max="6" value="0" placeholder="最大6" />
-  </div>
-
-    <div id="dynamicTacticsFormsContainer" style="margin-top:8px;">
-      </div>
-</div>
-
-
-<!-- 固有項目 -->
-
-<label style="margin-top:6px">【固有】</label>
-<label>
-    <br>
-    <input type="checkbox" id="hasUnique" style="margin-right:6px">
-    固有を所有
-</label>
-
-<div id="uniqueCountContainer" style="margin-top:6px; display:none;">
-    <label>所持固有数</label>
-    <input id="uniqueCount" type="number" min="0" max="10"value="0" placeholder="固有スキル数">
-</div>
-
-<div id="uniqueFormsContainer">
-    </div>
-
-
-  <!-- アイテム -->
-
-<label>【アイテム / 所持品】</label>
-
-  <textarea id="items"></textarea>
-
-<!-- 装備 E.G.O -->
-
-<div style="margin-top:12px;">
-  <label>【装備 E.G.O】</label>
-  <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px;">
-    
-    <!-- ZAYIN -->
-    <div>
-      <label>ZAYIN</label>
-      <input id="ego_zayin" type="text" placeholder="ZAYIN">
-      <div id="ego_zayin_extra" style="display:none; margin-top:4px; gap:4px;">
-        <div><label>発動条件</label><input id="ego_zayin_condition" type="text" placeholder="発動条件"></div>
-        <div><label>効果</label><textarea id="ego_zayin_effect" placeholder="効果"></textarea></div>
-        <div><label>覚醒スキル効果</label><textarea id="ego_zayin_awake" placeholder="覚醒スキル効果"></textarea></div>
-        <div><label>侵蝕スキル効果</label><textarea id="ego_zayin_corrode" placeholder="侵蝕スキル効果"></textarea></div>
-      </div>
-    </div>
-
-    <!-- TETH -->
-    <div>
-      <label>TETH</label>
-      <input id="ego_teth" type="text" placeholder="TETH">
-      <div id="ego_teth_extra" style="display:none; margin-top:4px; gap:4px;">
-        <div><label>発動条件</label><input id="ego_teth_condition" type="text" placeholder="発動条件"></div>
-        <div><label>効果</label><textarea id="ego_teth_effect" placeholder="効果"></textarea></div>
-        <div><label>覚醒スキル効果</label><textarea id="ego_teth_awake" placeholder="覚醒スキル効果"></textarea></div>
-        <div><label>侵蝕スキル効果</label><textarea id="ego_teth_corrode" placeholder="侵蝕スキル効果"></textarea></div>
-      </div>
-    </div>
-
-    <!-- HE -->
-    <div>
-      <label>HE</label>
-      <input id="ego_he" type="text" placeholder="HE">
-      <div id="ego_he_extra" style="display:none; margin-top:4px; gap:4px;">
-        <div><label>発動条件</label><input id="ego_he_condition" type="text" placeholder="発動条件"></div>
-        <div><label>効果</label><textarea id="ego_he_effect" placeholder="効果"></textarea></div>
-        <div><label>覚醒スキル効果</label><textarea id="ego_he_awake" placeholder="覚醒スキル効果"></textarea></div>
-        <div><label>侵蝕スキル効果</label><textarea id="ego_he_corrode" placeholder="侵蝕スキル効果"></textarea></div>
-      </div>
-    </div>
-
-    <!-- WAW -->
-    <div>
-      <label>WAW</label>
-      <input id="ego_waw" type="text" placeholder="WAW">
-      <div id="ego_waw_extra" style="display:none; margin-top:4px; gap:4px;">
-        <div><label>発動条件</label><input id="ego_waw_condition" type="text" placeholder="発動条件"></div>
-        <div><label>効果</label><textarea id="ego_waw_effect" placeholder="効果"></textarea></div>
-        <div><label>覚醒スキル効果</label><textarea id="ego_waw_awake" placeholder="覚醒スキル効果"></textarea></div>
-        <div><label>侵蝕スキル効果</label><textarea id="ego_waw_corrode" placeholder="侵蝕スキル効果"></textarea></div>
-      </div>
-    </div>
-
-    <!-- ALEPH -->
-    <div>
-      <label>ALEPH</label>
-      <input id="ego_aleph" type="text" placeholder="ALEPH">
-      <div id="ego_aleph_extra" style="display:none; margin-top:4px; gap:4px;">
-        <div><label>発動条件</label><input id="ego_aleph_condition" type="text" placeholder="発動条件"></div>
-        <div><label>効果</label><textarea id="ego_aleph_effect" placeholder="効果"></textarea></div>
-        <div><label>覚醒スキル効果</label><textarea id="ego_aleph_awake" placeholder="覚醒スキル効果"></textarea></div>
-        <div><label>侵蝕スキル効果</label><textarea id="ego_aleph_corrode" placeholder="侵蝕スキル効果"></textarea></div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
-<!-- 通貨 -->
-
-<div style="margin-top:16px;">
-  <label>【所持通貨】</label>
-  <div class="stat-grid">
-    <div class="stat">
-      <label>LP</label>
-      <input id="cur_lp" type="number" placeholder="LP">
-    </div>
-    <div class="stat">
-      <label>自我の欠片</label>
-      <input id="cur_frag" type="number" placeholder="自我の欠片">
-    </div>
-  </div>
-</div>
-
-
-  <!-- 右：所持人格 -->
-  <div>
-    <label>【所持人格】</label>
-    <textarea id="owned_personas" placeholder="・（人格名）"></textarea>
-  </div>
-
-  <!-- 左：身体強化 -->
-  <div>
-    <label>【身体強化】</label>
-    <textarea id="body_enhance" placeholder="・(身体強化名)"></textarea>
-  </div>
-
-  <div></div>
-
-          <div style="margin-top:12px">
-          <label>【所持 E.G.O】</label>
-          <textarea id="owned_ego" placeholder="・（E.G.O名）（危険度ランク）"></textarea>
+function displayResults(data) {
+    if (data.length === 0) {
+        searchResults.innerHTML = '<p>該当するデータがありません。</p>';
+        return;
+    }
+    searchResults.innerHTML = data.map(item => `
+        <div class="search-result-item">
+            ${Object.entries(item).map(([k, v]) => v ? `<div><strong>${k}:</strong> ${v}</div>` : '').join('')}
         </div>
-
-        <div style="margin-top:12px">
-          <label>【所持サポートパッシブ】</label>
-          <textarea id="owned_support_passives" placeholder="・（サポートパッシブ名）"></textarea>
-        </div>
-
-        <div style="margin-top:12px">
-          <label>【所持精神】</label>
-          <textarea id="owned_spirits" placeholder="・（精神名)"></textarea>
-        </div>
-<style>
-
-#free_note_1,
-#free_note_2 {
-  height: 120px; 
-  resize: vertical;
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: 4px;
+    `).join('');
 }
-</style>
 
-<div style="margin-top:12px">
-  <label>【自由記入欄 1】</label>
-  <textarea id="free_note_1" placeholder="メモ、備考、キャラクター設定など"></textarea>
-</div>
+// イベント設定
+searchButton.onclick = async () => {
+    searchModal.style.display = 'flex';
+    currentSearchData = await loadSearchData(csvSelector.value);
+    renderDynamicInputs(csvSelector.value);
+    performSearch();
+};
 
-<div style="margin-top:12px">
-  <label>【自由記入欄 2】</label>
-  <textarea id="free_note_2" placeholder="シナリオ履歴など"></textarea>
-</div>
+closeBtn.onclick = () => searchModal.style.display = 'none';
+csvSelector.onchange = async () => {
+    currentSearchData = await loadSearchData(csvSelector.value);
+    renderDynamicInputs(csvSelector.value);
+    performSearch();
+};
+searchInput.oninput = () => performSearch();
+window.onclick = (e) => { if(e.target == searchModal) searchModal.style.display = 'none'; };
+</script>
 
-</form>
-<div style="font-size: 12px; line-height: 1.5;">
-  このサイトは 
-  <a href="https://x.com/limbustrpg" target="_blank" style="color: white;">@limbustrpg</a> 
-  様制作のTRPGシステム用非公式キャラクターシートメーカーです。
-</div>
-</section>
-
-<aside class="preview" style="flex:1;">
-  <div class="card">
-    <div style="font-size:1.1rem;font-weight:800" id="pPcName">—</div>
-    <div style="font-size:0.85rem;color:#888" id="pPlName">—</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【ステータス】</div>
-  <div>人格:<Span id="pPersona">—</div>
-  <div>HP: <span id="pHp">—</span></div>
-  <div>SAN: <span id="pSan">—</span></div>
-  <div>速度: <span id="pSpeed">—</span></div>
-  <div>斬撃: <span id="pSlash">—</span></div>
-  <div>貫通: <span id="pPierce">—</span></div>
-  <div>打撃: <span id="pBlunt">—</span></div>
-  <div>精神: <span id="pMind">—</span></div>
-  <div>精神効果：<span id="pMindEffect">—</span></div>
-  <div style="margin-top:12px">
-    </div>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【パッシブ】</div>
-  <pre id="pPassives">—</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【サポートパッシブ】</div>
-  <pre id="pSupport">—</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【死亡後パッシブ】</div>
-  <pre id="preview_deathpassive">なし</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【戦術】</div>
-  <pre id="pTactics">—</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【固有】</div>
-  <pre id="pUniqueItems">なし</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【アイテム / 所持品】</div>
-  <pre id="pItems">—</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【装備 E.G.O】</div>
-  <pre id="pEgo">なし</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【所持通貨 / その他】</div>
-  <pre id="pCurrency">—</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【所持人格】</div>
-  <pre id="pPersonas">—</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【身体強化】</div>
-  <pre id="pBodyEnhance">—</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【所持 E.G.O】</div>
-  <pre id="pOwnedEgo">—</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【所持サポートパッシブ】</div>
-  <pre id="pOwnedSupportPassives">—</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【所持精神】</div>
-  <pre id="pOwnedSpirits">—</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【自由記入欄 1】</div>
-  <pre id="pFreeNote1">—</pre>
-</div>
-
-<div style="margin-top:12px">
-  <div style="font-size:13px;color:#888">【自由記入欄 2】</div>
-  <pre id="pFreeNote2">—</pre>
-</div>
-<div class="card" style="margin-top:12px; padding:12px; max-width: 1000px; margin-left: auto; margin-right: auto;">
-  <label style="font-weight:bold; display:block; margin-bottom: 8px;">PCスロット保存・読み込み:</label>
-  <div style="display:flex; flex-direction: column; gap: 8px;">
-    <div style="display:flex;gap:8px;align-items:center;">
-      <label id="slot1_label" style="min-width: 60px;">スロット 1:</label>
-      <button type="button" class="btn slot-save" data-slot="1">S1 保存</button>
-      <button type="button" class="btn ghost slot-load" data-slot="1">S1 読込</button>
-<button type="button" class="btn ghost slot-delete" data-slot="1" style="color: red; border-color: red;">削除</button>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <label id="slot2_label" style="min-width: 60px;">スロット 2:</label>
-      <button type="button" class="btn slot-save" data-slot="2">S2 保存</button>
-      <button type="button" class="btn ghost slot-load" data-slot="2">S2 読込</button>
-<button type="button" class="btn ghost slot-delete" data-slot="2" style="color: red; border-color: red;">削除</button>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <label id="slot3_label" style="min-width: 60px;">スロット 3:</label>
-      <button type="button" class="btn slot-save" data-slot="3">S3 保存</button>
-      <button type="button" class="btn ghost slot-load" data-slot="3">S3 読込</button>
-<button type="button" class="btn ghost slot-delete" data-slot="3" style="color: red; border-color: red;">削除</button>
-    </div>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <label id="slot4_label" style="min-width: 60px;">スロット 4:</label>
-      <button type="button" class="btn slot-save" data-slot="4">S4 保存</button>
-      <button type="button" class="btn ghost slot-load" data-slot="4">S4 読込</button>
-<button type="button" class="btn ghost slot-delete" data-slot="4" style="color: red; border-color: red;">削除</button>
-    </div>
-  </div>
-</div>
-
-</div>
-</aside>
-
-  </div>
-</main>
-
-<script src="script.js"></script>
 </body>
 </html>
-
-
-
-
