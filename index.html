@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Database Search Tool - Complete Edition</title>
+    <title>LTB検索データベース</title>
     <style>
         :root {
             --bg: #071121;
@@ -78,7 +78,7 @@
 <body>
 
 <div class="search-container">
-    <h2>DATABASE ARCHIVE</h2>
+    <h2>LTB検索データベース</h2>
 
     <div class="search-controls">
         <div>
@@ -89,7 +89,7 @@
         <div id="searchInputsContainer"></div>
         
         <div>
-            <label>共通キーワード (全項目対象)</label>
+            <label>キーワード</label>
             <input id="searchInput" type="text" placeholder="キーワードを入力..." />
         </div>
     </div>
@@ -114,28 +114,28 @@
 
     const SEARCH_FIELDS = {
         'identity': [
-            { id: 'f_no', label: '番号 (完全一致)', type: 'text', csvKey: '番号' },
+            { id: 'f_no', label: '番号', type: 'text', csvKey: '番号' },
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' }
         ],
         'singularidentity': [
-            { id: 'f_no', label: '番号 (完全一致)', type: 'text', csvKey: '番号' },
+            { id: 'f_no', label: '番号', type: 'text', csvKey: '番号' },
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' }
         ],
         'suppassive': [
             { id: 'f_type', label: '種別', type: 'select', options: ['', '通常', '死亡'], csvKey: '種別' },
             { id: 'f_res', label: '資源', type: 'select', options: ['', '憤怒', '色欲','怠惰','暴食','憂鬱','傲慢','嫉妬','なし'], csvKey: '資源' },
             { id: 'f_own', label: '発動条件', type: 'select', options: ['', '保有', '共鳴','なし'], csvKey: '保有・共鳴' },
-            { id: 'f_price', label: '価格以下', type: 'number', csvKey: '価格' }
+            { id: 'f_price', label: '価格', type: 'number', csvKey: '価格' }
         ],
         'mental': [
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
-            { id: 'f_price', label: '価格以下', type: 'number', csvKey: '価格' }
+            { id: 'f_price', label: '価格', type: 'number', csvKey: '価格' }
         ],
         'ego': [
             { id: 'f_no', label: '番号 (完全一致)', type: 'text', csvKey: '番号' },
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
             { id: 'f_rank', label: '危険度', type: 'select', options: ['', 'ZAYIN', 'TETH', 'HE', 'WAW', 'ALEPH'], csvKey: '危険度' },
-            { id: 'f_price', label: '価格以下', type: 'number', csvKey: '価格' }
+            { id: 'f_price', label: '価格', type: 'number', csvKey: '価格' }
         ],
         'status': [
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
@@ -300,3 +300,4 @@
 
 </body>
 </html>
+
