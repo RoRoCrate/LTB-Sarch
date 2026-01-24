@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Limbus Archive - 検索データベース</title>
+    <title>Database Search Tool</title>
     <style>
         :root {
             --bg: #071121;
@@ -28,15 +28,15 @@
             padding: 30px;
             border-radius: var(--radius);
             width: 95%;
-            max-width: 850px;
+            max-width: 800px;
             border: 1px solid var(--accent);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
             margin: 20px;
         }
 
-        h2 { text-align: center; color: var(--accent); letter-spacing: 2px; margin-top: 0; }
+        h2 { text-align: center; color: var(--accent); margin-top: 0; border-bottom: 1px solid #1e203d; padding-bottom: 15px; }
 
-        .search-controls { display: flex; flex-direction: column; gap: 15px; }
+        .search-controls { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; }
 
         #searchInputsContainer { display: flex; flex-wrap: wrap; gap: 10px; }
 
@@ -49,7 +49,7 @@
 
         input:focus, select:focus { border-color: var(--accent); }
 
-        label { display: block; font-size: 0.85rem; color: var(--muted); margin-bottom: 4px; }
+        label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 4px; font-weight: bold; }
 
         #searchResultWrapper {
             margin-top: 25px; max-height: 500px; overflow-y: auto;
@@ -65,13 +65,12 @@
         .copy-btn {
             position: absolute; right: 10px; top: 10px;
             background: var(--accent); color: #000; border: none;
-            padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: bold;
-            transition: all 0.2s;
+            padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: bold;
         }
 
         .field { margin-bottom: 4px; font-size: 0.9rem; line-height: 1.4; display: flex; }
-        .field-label { color: var(--accent); font-weight: bold; min-width: 100px; margin-right: 8px; }
-        .field-value { flex: 1; white-space: pre-wrap; }
+        .field-label { color: var(--accent); font-weight: bold; min-width: 110px; margin-right: 8px; }
+        .field-value { flex: 1; }
 
         @media (max-width: 600px) { .search-input-group { width: 100%; } }
     </style>
@@ -79,18 +78,18 @@
 <body>
 
 <div class="search-container">
-    <h2>ARCHIVE SEARCH</h2>
+    <h2>DATABASE ARCHIVE</h2>
 
     <div class="search-controls">
         <div>
-            <label>検索対象データ</label>
+            <label>検索カテゴリ</label>
             <select id="csvSelector"></select>
         </div>
 
         <div id="searchInputsContainer"></div>
         
         <div>
-            <label>共通キーワード検索 (全項目共通)</label>
+            <label>共通キーワード (全項目対象)</label>
             <input id="searchInput" type="text" placeholder="キーワードを入力..." />
         </div>
     </div>
@@ -101,7 +100,7 @@
 </div>
 
 <script>
-    // フォルダ設定
+    // GitHub環境を想定したdataフォルダパス
     const DATA_DIR = './data/';
 
     const CSV_FILE_MAP = {
@@ -124,19 +123,19 @@
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' }
         ],
         'suppassive': [
-            { id: 'f_type', label: '通常/死亡', type: 'select', options: ['', '通常', '死亡'], csvKey: '種別' },
+            { id: 'f_type', label: '種別', type: 'select', options: ['', '通常', '死亡'], csvKey: '種別' },
             { id: 'f_res', label: '資源', type: 'select', options: ['', '憤怒', '色欲','怠惰','暴食','憂鬱','傲慢','嫉妬','なし'], csvKey: '資源' },
-            { id: 'f_own', label: '保有/共鳴/なし', type: 'select', options: ['', '保有', '共鳴','なし'], csvKey: '保有・共鳴' },
-            { id: 'f_price', label: '価格 (以下)', type: 'number', csvKey: '価格' }
+            { id: 'f_own', label: '発動条件', type: 'select', options: ['', '保有', '共鳴','なし'], csvKey: '保有・共鳴' },
+            { id: 'f_price', label: '価格以下', type: 'number', csvKey: '価格' }
         ],
         'mental': [
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
-            { id: 'f_price', label: '価格 (以下)', type: 'number', csvKey: '価格' }
+            { id: 'f_price', label: '価格以下', type: 'number', csvKey: '価格' }
         ],
         'ego': [
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
             { id: 'f_rank', label: '危険度', type: 'select', options: ['', 'ZAYIN', 'TETH', 'HE', 'WAW', 'ALEPH'], csvKey: '危険度' },
-            { id: 'f_price', label: '価格 (以下)', type: 'number', csvKey: '価格' }
+            { id: 'f_price', label: '価格以下', type: 'number', csvKey: '価格' }
         ],
         'status': [
             { id: 'f_name', label: '名称', type: 'text', csvKey: '名称' },
@@ -178,7 +177,7 @@
                     return obj;
                 });
             } catch (e) {
-                searchResults.innerHTML = `<p style="color:red">エラー: ${CSV_FILE_MAP[key].url} の読み込みに失敗しました。</p>`;
+                searchResults.innerHTML = `<p style="color:red">データのロードに失敗しました (Path: ${CSV_FILE_MAP[key].url})</p>`;
                 return;
             }
         }
@@ -247,44 +246,42 @@
         searchResults.innerHTML = data.map((item, idx) => {
             const htmlFields = Object.entries(item).map(([k, v]) => {
                 if(!v) return '';
-                return `<div class="field"><span class="field-label">${k}</span><span class="field-value">${v}</span></div>`;
+                return `<div class="field"><span class="field-label">${k}:</span><span class="field-value">${v}</span></div>`;
             }).join('');
 
             return `
                 <div class="result-item" id="item-${idx}">
-                    <button class="copy-btn" onclick="copyDisplayedText('item-${idx}')">コピー</button>
-                    <div class="item-content">${htmlFields}</div>
+                    <button class="copy-btn" onclick="copyDisplayedContent('item-${idx}')">コピー</button>
+                    <div class="item-body">${htmlFields}</div>
                 </div>
             `;
         }).join('');
     }
 
-    // 「表示されている状態のまま」コピーする関数
-    async function copyDisplayedText(containerId) {
-        const container = document.getElementById(containerId);
-        const fields = container.querySelectorAll('.field');
-        const btn = container.querySelector('.copy-btn');
+    // 表示されている通りにコピーする関数
+    async function copyDisplayedContent(id) {
+        const itemBody = document.querySelector(`#${id} .item-body`);
+        const btn = document.querySelector(`#${id} .copy-btn`);
         
-        // ラベル: 値 の形式でテキストを組み立て
-        let textArr = [];
-        fields.forEach(f => {
+        // field内のlabelとvalueを取得して結合
+        const fields = itemBody.querySelectorAll('.field');
+        const textToCopy = Array.from(fields).map(f => {
             const label = f.querySelector('.field-label').innerText;
             const value = f.querySelector('.field-value').innerText;
-            textArr.push(`${label}: ${value}`);
-        });
-        const finalText = textArr.join('\n');
+            return `${label} ${value}`;
+        }).join('\n');
 
         try {
-            await navigator.clipboard.writeText(finalText);
+            await navigator.clipboard.writeText(textToCopy);
             const originalText = btn.innerText;
-            btn.innerText = '完了！';
+            btn.innerText = '完了!';
             btn.style.background = '#4ade80';
             setTimeout(() => {
                 btn.innerText = originalText;
                 btn.style.background = 'var(--accent)';
-            }, 1000);
+            }, 800);
         } catch (err) {
-            alert('コピーに失敗しました');
+            alert('コピーできませんでした。');
         }
     }
 
