@@ -45,14 +45,10 @@
             background-color: var(--bg);
             color: #fff;
             margin: 0;
-            padding-top: 50px; /* 上部バーの高さ分 */
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* ↓ 追加：上下中央に配置する */
-            justify-content: center; 
-            height: 100vh;
-            overflow: hidden;
+            padding-top: 60px; /* 上部バーの回避 */
+            display: block;    /* flexを解除して標準的なブロックレイアウトに */
+            min-height: 100vh;
+            overflow-y: auto;  /* ウィンドウスクロールを有効化 */
             box-sizing: border-box;
         }
 
@@ -77,22 +73,19 @@
 
        .search-container {
             background: var(--card);
-            padding: 15px;
+            padding: 20px;
             border-radius: var(--radius);
-            width: 95%;
-            max-width: 800px;
-            /* ↓ 修正：画面の高さに合わせてリサイズされるようにする */
-            max-height: 80vh; 
+            width: 95%;        /* スマホでは画面幅いっぱいに近く */
+            max-width: 800px;  /* PCでも広がりすぎない制限 */
             border: 1px solid var(--accent);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-            /* ↓ 修正：中央配置のため上下マージンを自動に */
-            margin: auto; 
+
+            /* ↓ 中央寄せのポイント */
+            margin: 20px auto 40px auto; 
             box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            /* ↓ 修正：flex-1を解除して中央に収める */
-            flex: none; 
-            min-height: 0;
+
+            /* ↓ 内部の検索結果が横幅いっぱいに広がるように設定 */
+            display: block; 
         }
 
         /* 見出し：大きな文字扱い */
@@ -145,11 +138,10 @@
 
        #searchResultWrapper {
             margin-top: 15px;
-            flex: 1;              /* 余った高さをすべてこのエリアに割り当てる */
-            overflow-y: auto;     /* 内容が多い場合、ここだけスクロールバーを出す */
+            /* ウィンドウスクロールを優先するため、ここではスクロールさせない */
+            overflow-y: visible; 
             border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-top: 15px;
-            min-height: 0;        /* スクロール崩れ防止 */
         }
 
         .result-item {
@@ -159,6 +151,9 @@
             border-radius: 8px; 
             border-left: 4px solid var(--accent);
             position: relative;
+            /* ↓ 確実に横幅いっぱいにする */
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .copy-btn {
@@ -185,9 +180,14 @@
         }
         .field-value { flex: 1; word-break: break-all; }
 
-        @media (min-width: 601px) {
-            .field { flex-direction: row; }
-            .field-label { min-width: 110px; margin-right: 8px; font-size: 0.9rem; }
+        @media (max-width: 600px) {
+            body {
+                padding-top: 70px; /* バーとの余白を少し多めに */
+            }
+            .search-container {
+                padding: 15px;
+                width: 92%; /* 左右に少し隙間を作る */
+            }
         }
 
         footer {
@@ -226,17 +226,18 @@
     </div>
 </div>
 
-</div> <footer style="width: 100%; margin-top: auto; padding: 20px 0; text-align: center;">
-        <div style="font-size: 12px; line-height: 1.5; color: #ccc;">
-            このサイトは 
-            <a href="https://x.com/limbustrpg" target="_blank" style="color: #5560aa; text-decoration: none;">@limbustrpg</a> 
-            様制作TRPGシステム用検索データベースです
-            <br>
-            不具合や要望、更新情報は 
-            <a href="https://x.com/Roro_Crate" target="_blank" style="color: #5560aa; text-decoration: none;">@Roro_Crate</a> 
-            まで
-        </div>
-    </footer>
+<footer style="width: 100%; padding: 20px 0; text-align: center;">
+    <div style="font-size: 12px; line-height: 1.5; color: #ccc;">
+        このサイトは 
+        <a href="https://x.com/limbustrpg" target="_blank" style="color: #5560aa; text-decoration: none;">@limbustrpg</a> 
+        様制作TRPGシステム用検索データベースです
+        <br>
+        不具合や要望、更新情報は 
+        <a href="https://x.com/Roro_Crate" target="_blank" style="color: #5560aa; text-decoration: none;">@Roro_Crate</a> 
+        まで
+    </div>
+    
+</footer>
 <script>
     const DATA_DIR = './data/';
     const CSV_FILE_MAP = {
