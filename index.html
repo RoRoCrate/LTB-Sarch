@@ -45,12 +45,14 @@
             background-color: var(--bg);
             color: #fff;
             margin: 0;
-            padding-top: 60px; /* 上部バーの余白 */
+            padding-top: 50px; /* 上部バーの高さ分 */
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 100vh;        /* min-height から height に変更 */
-            overflow: hidden;     /* ウィンドウ自体のスクロールを完全に禁止 */
+            /* ↓ 追加：上下中央に配置する */
+            justify-content: center; 
+            height: 100vh;
+            overflow: hidden;
             box-sizing: border-box;
         }
 
@@ -73,22 +75,24 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
 
-        .search-container {
+       .search-container {
             background: var(--card);
-            padding: 20px;
+            padding: 15px;
             border-radius: var(--radius);
-            width: 95%;           /* 左右に少し余裕を持たせる */
+            width: 95%;
             max-width: 800px;
+            /* ↓ 修正：画面の高さに合わせてリサイズされるようにする */
+            max-height: 80vh; 
             border: 1px solid var(--accent);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-            margin: 10px auto;    /* 上下の余白を調整 */
+            /* ↓ 修正：中央配置のため上下マージンを自動に */
+            margin: auto; 
             box-sizing: border-box;
-
-            /* フレックスボックス化して、中身の「結果エリア」を伸ばす */
             display: flex;
             flex-direction: column;
-            flex: 1;              /* 画面の空きスペースを埋める */
-            min-height: 0;        /* 子要素のスクロールを正しく機能させるために必須 */
+            /* ↓ 修正：flex-1を解除して中央に収める */
+            flex: none; 
+            min-height: 0;
         }
 
         /* 見出し：大きな文字扱い */
@@ -188,9 +192,9 @@
 
         footer {
             width: 100%;
-            padding: 10px 0;      /* 少しスリムに */
+            padding: 10px 0;
             text-align: center;
-            flex-shrink: 0;       /* 潰れないように固定 */
+            flex-shrink: 0;
         }
     </style>
 </head>
@@ -312,6 +316,11 @@
         currentData = cache[key];
         renderFields(key);
         performSearch();
+
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // スルッと戻る（即座に戻したい場合は 'auto'）
+        });
     }
 
     function renderFields(key) {
