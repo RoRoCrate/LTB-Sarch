@@ -21,181 +21,190 @@
     <link rel="icon" href="/path/to/favicon.ico">
     
     <style>
-        /* フォントの読み込み (Corporate Logo) */
-        @font-face {
-            font-family: 'Corporate-Logo-Bold';
-            src: url('https://cdn.jsdelivr.net/gh/logotype/corporate-logo-font@master/fonts/Corporate-Logo-Bold-ver3.woff2') format('woff2');
-        }
-        @font-face {
-            font-family: 'Corporate-Logo-Medium';
-            src: url('https://cdn.jsdelivr.net/gh/logotype/corporate-logo-font@master/fonts/Corporate-Logo-Medium-ver3.woff2') format('woff2');
-        }
+/* フォントの読み込み (Corporate Logo) */
+@font-face {
+    font-family: 'Corporate-Logo-Bold';
+    src: url('https://cdn.jsdelivr.net/gh/logotype/corporate-logo-font@master/fonts/Corporate-Logo-Bold-ver3.woff2') format('woff2');
+}
+@font-face {
+    font-family: 'Corporate-Logo-Medium';
+    src: url('https://cdn.jsdelivr.net/gh/logotype/corporate-logo-font@master/fonts/Corporate-Logo-Medium-ver3.woff2') format('woff2');
+}
 
-        :root {
-            --bg: #071121;
-            --card: #0b1220;
-            --muted: #9aa6b2;
-            --accent: #60a5fa;
-            --radius: 12px;
-            /* 基本のフォント設定：普通の文字 */
-            font-family: 'Corporate-Logo-Medium', sans-serif;
-        }
+:root {
+    --bg: #071121;
+    --card: #0b1220;
+    --muted: #9aa6b2;
+    --accent: #60a5fa;
+    --radius: 12px;
+    font-family: 'Corporate-Logo-Medium', sans-serif;
+}
 
-        body {
-            background-color: var(--bg);
-            color: #fff;
-            margin: 0;
-            padding-top: 60px; /* 上部バーの回避 */
-            display: block;    /* flexを解除して標準的なブロックレイアウトに */
-            min-height: 100vh;
-            overflow-y: auto;  /* ウィンドウスクロールを有効化 */
-            box-sizing: border-box;
-        }
+/* --- レイアウト基本設定 --- */
+body {
+    background-color: var(--bg);
+    color: #fff;
+    margin: 0;
+    padding-top: 60px; /* 上部バーの高さ分 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* 画面全体をスクロール可能にする */
+    min-height: 100vh;
+    overflow-y: auto; 
+    box-sizing: border-box;
+}
 
+/* ページ上部の白いバー */
+.top-white-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background-color: #ffffff;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Corporate-Logo-Bold', sans-serif;
+    font-size: 1.2rem;
+    z-index: 9999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
 
-        /* ページ上部の白いバー：大きな文字扱い */
-        .top-white-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 50px;
-            background-color: #ffffff;
-            color: #000000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Corporate-Logo-Bold', sans-serif; /* 太字 */
-            font-size: 1.2rem;
-            z-index: 9999;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
+/* --- メインコンテナ --- */
+.search-container {
+    background: var(--card);
+    padding: 20px;
+    border-radius: var(--radius);
+    width: 95%;
+    max-width: 800px;
+    /* 検索窓が画面からはみ出さないよう高さを制限（スマホでも操作しやすく） */
+    max-height: 80vh; 
+    border: 1px solid var(--accent);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    margin: 20px auto; 
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0; /* 親のFlexによって縮まないように固定 */
+}
 
-       .search-container {
-            background: var(--card);
-            padding: 20px;
-            border-radius: var(--radius);
-            width: 95%;        /* スマホでは画面幅いっぱいに近く */
-            max-width: 800px;  /* PCでも広がりすぎない制限 */
-            border: 1px solid var(--accent);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+h2 { 
+    text-align: center; 
+    color: var(--accent); 
+    margin-top: 0; 
+    font-family: 'Corporate-Logo-Bold', sans-serif;
+    font-size: 1.6rem;
+    border-bottom: 1px solid #1e203d; 
+    padding-bottom: 15px; 
+    letter-spacing: 0.1em;
+}
 
-            /* ↓ 中央寄せのポイント */
-            margin: 20px auto 40px auto; 
-            box-sizing: border-box;
+/* --- 検索フォーム --- */
+.search-controls { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    margin-top: 15px; 
+    flex-shrink: 0; /* フォーム部分が潰れないように */
+}
 
-            /* ↓ 内部の検索結果が横幅いっぱいに広がるように設定 */
-            display: block; 
-        }
+#searchInputsContainer { display: flex; flex-wrap: wrap; gap: 10px; }
+.search-input-group { width: calc(50% - 5px); box-sizing: border-box; }
 
-        /* 見出し：大きな文字扱い */
-        h2 { 
-            text-align: center; 
-            color: var(--accent); 
-            margin-top: 0; 
-            font-family: 'Corporate-Logo-Bold', sans-serif; /* 太字 */
-            font-size: 1.6rem;
-            border-bottom: 1px solid #1e203d; 
-            padding-bottom: 15px; 
-            letter-spacing: 0.1em;
-        }
+input[type="text"], input[type="number"], select {
+    width: 100%; 
+    padding: 12px;
+    background: #1e203d; 
+    border: 1px solid #5560aa;
+    color: #fff; 
+    border-radius: 8px; 
+    box-sizing: border-box; 
+    outline: none;
+    font-family: 'Corporate-Logo-Medium', sans-serif;
+    font-size: 16px; /* スマホの自動ズーム防止 */
+}
 
-        /* 以下、通常の要素（Medium適用） */
-        .search-controls { display: flex; flex-direction: column; gap: 12px; margin-top: 15px; }
-        #searchInputsContainer { display: flex; flex-wrap: wrap; gap: 10px; }
-        .search-input-group { width: calc(50% - 5px); box-sizing: border-box; }
+input:focus, select:focus { border-color: var(--accent); }
 
-        @media (max-width: 600px) {
-            .search-input-group { width: 100%; }
-            h2 { font-size: 1.3rem; }
-            .search-container { padding: 15px; }
-            .top-white-bar { font-size: 1rem; }
-        }
+label { 
+    display: block; 
+    font-size: 0.85rem; 
+    color: var(--muted); 
+    margin-bottom: 4px; 
+    font-family: 'Corporate-Logo-Bold', sans-serif; 
+}
 
-        input[type="text"], input[type="number"], select {
-            width: 100%; 
-            padding: 12px;
-            background: #1e203d; 
-            border: 1px solid #5560aa;
-            color: #fff; 
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            outline: none;
-            font-family: 'Corporate-Logo-Medium', sans-serif;
-            font-size: 16px;
-        }
+/* --- 検索結果エリア（ここがスクロールする） --- */
+#searchResultWrapper {
+    margin-top: 15px;
+    flex: 1;              /* 余った高さをすべて占有 */
+    overflow-y: auto;     /* 内容が多い場合に内部スクロール */
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 15px;
+    min-height: 0;        /* Flexボックス内のスクロール崩れ防止 */
+    -webkit-overflow-scrolling: touch; /* iOSのスクロールを滑らかに */
+}
 
-        input:focus, select:focus { border-color: var(--accent); }
+.result-item {
+    background: rgba(255, 255, 255, 0.03); 
+    padding: 15px; 
+    margin-bottom: 12px;
+    border-radius: 8px; 
+    border-left: 4px solid var(--accent);
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+}
 
-        /* ラベル：少し強調したいのでBold */
-        label { 
-            display: block; 
-            font-size: 0.85rem; 
-            color: var(--muted); 
-            margin-bottom: 4px; 
-            font-family: 'Corporate-Logo-Bold', sans-serif; 
-        }
+.copy-btn {
+    position: absolute; 
+    right: 8px; 
+    top: 8px;
+    background: var(--accent); 
+    color: #000; 
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-family: 'Corporate-Logo-Bold', sans-serif;
+    font-size: 0.75rem; 
+    z-index: 10;
+}
 
-       #searchResultWrapper {
-            margin-top: 15px;
-            /* ウィンドウスクロールを優先するため、ここではスクロールさせない */
-            overflow-y: visible; 
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding-top: 15px;
-        }
+.field { margin-bottom: 6px; font-size: 1rem; line-height: 1.5; display: flex; flex-direction: column; }
+.field-label { 
+    color: var(--accent); 
+    font-family: 'Corporate-Logo-Bold', sans-serif;
+    font-size: 0.8rem; 
+    margin-bottom: 1px; 
+}
+.field-value { flex: 1; word-break: break-all; }
 
-        .result-item {
-            background: rgba(255, 255, 255, 0.03); 
-            padding: 15px; 
-            margin-bottom: 12px;
-            border-radius: 8px; 
-            border-left: 4px solid var(--accent);
-            position: relative;
-            /* ↓ 確実に横幅いっぱいにする */
-            width: 100%;
-            box-sizing: border-box;
-        }
+/* --- レスポンシブ調整 --- */
+@media (max-width: 600px) {
+    .search-input-group { width: 100%; }
+    h2 { font-size: 1.3rem; }
+    .search-container { padding: 15px; max-height: 75vh; } /* スマホは少し短めに */
+    .top-white-bar { font-size: 1rem; }
+    .field-label { font-size: 0.75rem; }
+}
 
-        .copy-btn {
-            position: absolute; 
-            right: 8px; 
-            top: 8px;
-            background: var(--accent); 
-            color: #000; 
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px; 
-            cursor: pointer; 
-            font-family: 'Corporate-Logo-Bold', sans-serif;
-            font-size: 0.75rem; 
-            z-index: 10;
-        }
+@media (min-width: 601px) {
+    .field { flex-direction: row; }
+    .field-label { min-width: 110px; margin-right: 8px; font-size: 0.9rem; }
+}
 
-        .field { margin-bottom: 6px; font-size: 1rem; line-height: 1.5; display: flex; flex-direction: column; }
-        .field-label { 
-            color: var(--accent); 
-            font-family: 'Corporate-Logo-Bold', sans-serif; /* 項目名はBold */
-            font-size: 0.8rem; 
-            margin-bottom: 1px; 
-        }
-        .field-value { flex: 1; word-break: break-all; }
-
-        @media (max-width: 600px) {
-            body {
-                padding-top: 70px; /* バーとの余白を少し多めに */
-            }
-            .search-container {
-                padding: 15px;
-                width: 92%; /* 左右に少し隙間を作る */
-            }
-        }
-
-        footer {
-            width: 100%;
-            padding: 10px 0;
-            text-align: center;
-            flex-shrink: 0;
-        }
+/* --- フッター --- */
+footer {
+    width: 100%;
+    margin-top: auto; 
+    padding: 30px 0;
+    text-align: center;
+    flex-shrink: 0;
+}
     </style>
 </head>
 <body>
@@ -453,7 +462,6 @@
 
 </body>
 </html>
-
 
 
 
