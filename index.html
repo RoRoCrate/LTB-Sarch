@@ -325,26 +325,24 @@
         const query = searchInput.value.toLowerCase();
         const key = csvSelector.value;
         const fields = SEARCH_FIELDS[key];
-        const hasInput = query || fields.some(f => {
-            const el = document.getElementById(f.id);
-            return el && el.value !== '';
-        });
-        if (!hasInput) {
-            searchResults.innerHTML = '<p style="text-align:center; color:var(--muted); margin-top:20px;">条件を入力してください</p>';
-            return;
-        }
+
         const filtered = currentData.filter(item => {
-            const keywordMatch = Object.values(item).some(v => String(v).toLowerCase().includes(query));
+            const keywordMatch = !query || Object.values(item).some(v => String(v).toLowerCase().includes(query));
+            
             const dynamicMatch = fields.every(f => {
                 const el = document.getElementById(f.id);
                 if (!el || el.value === '') return true;
                 const val = item[f.csvKey];
+                
                 if (f.id === 'f_no') return String(val) === String(el.value);
                 if (f.type === 'number') return val !== '' && Number(val) <= Number(el.value);
+
                 return String(val).toLowerCase().includes(el.value.toLowerCase());
             });
+            
             return keywordMatch && dynamicMatch;
         });
+
         renderResults(filtered);
     }
 
@@ -387,7 +385,6 @@
 
 </body>
 </html>
-
 
 
 
