@@ -192,7 +192,7 @@
             text-align: center;
             flex-shrink: 0;       /* 潰れないように固定 */
         }
-        
+
     </style>
 </head>
 <body>
@@ -376,15 +376,38 @@
         }).join('');
     }
 
-    async function copyDisplayedContent(id) {
+  async function copyDisplayedContent(id) {
         const itemBody = document.querySelector(`#${id} .item-body`);
         const btn = document.querySelector(`#${id} .copy-btn`);
         const fields = itemBody.querySelectorAll('.field');
-        const textToCopy = Array.from(fields).map(f => {
-            const label = f.querySelector('.field-label').innerText;
-            const value = f.querySelector('.field-value').innerText;
-            return `${label}: ${value}`;
-        }).join('\n');
+        
+        let textToCopy = "";
+        const key = csvSelector.value;
+
+        if (key === 'suppassive') {
+            const data = {};
+            fields.forEach(f => {
+                const label = f.querySelector('.field-label').innerText;
+                const value = f.querySelector('.field-value').innerText;
+                data[label] = value;
+            });
+
+            const name = data['名称'] || '';
+            const res = data['資源'] || '';
+            const cond = data['保有・共鳴'] || '';
+            const effect = data['効果'] || '';
+
+
+            textToCopy = `名称:${name}\n発動条件:${res}${cond}\n効果:${effect}`;
+        } else {
+
+            textToCopy = Array.from(fields).map(f => {
+                const label = f.querySelector('.field-label').innerText;
+                const value = f.querySelector('.field-value').innerText;
+                return `${label}: ${value}`;
+            }).join('\n');
+        }
+
         try {
             await navigator.clipboard.writeText(textToCopy);
             const originalText = btn.innerText;
