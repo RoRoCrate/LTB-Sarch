@@ -421,7 +421,22 @@ footer {
             data[label] = value;
         });
 
-        if (key === 'suppassive') {
+        if (key === 'identity' || key === 'singularidentity') {
+            textToCopy = 
+                `名称:${data['名称'] || ''}\n` +
+                `${data['HP'] || ''}　${data['SAN'] || ''}　${data['速度'] || ''}\n` +
+                `${data['斬撃'] || ''}　${data['貫通'] || ''}　${data['打撃'] || ''}　${data['弾丸'] || ''}\n\n` +
+                `${data['パッシブ名'] || ''}　${data['発動条件'] || ''}\n` +
+                `${data['効果'] || ''}\n\n` +
+                `戦術0名称: ${data['戦術0名称'] || ''} 　戦術0効果: ${data['戦術0効果'] || ''}\n` +
+                `戦術1名称: ${data['戦術1名称'] || ''} 　戦術1効果: ${data['戦術1効果'] || ''}\n` +
+                `戦術2名称: ${data['戦術2名称'] || ''} 　戦術2効果: ${data['戦術2効果'] || ''}\n` +
+                `戦術3名称: ${data['戦術3名称'] || ''} 　戦術3効果: ${data['戦術3効果'] || ''}\n` +
+                `戦術4名称: ${data['戦術4名称'] || ''} 　戦術4効果: ${data['戦術4効果'] || ''}\n` +
+                `強化スキル: ${data['強化スキル'] || ''}\n\n` +
+                `固有: ${data['固有'] || ''}`;
+
+        } else if (key === 'suppassive') {
             // サポートパッシブ用
             const name = data['名称'] || '';
             const res = data['資源'] || '';
@@ -430,26 +445,23 @@ footer {
             textToCopy = `名称:${name}\n発動条件:${res}${cond}\n効果:${effect}`;
 
         } else if (key === 'ego') {
-            // E.G.O用：ご指定のレイアウトを厳密に再現
+            // E.G.O用
             const rank = data['危険度'] || '';
             const name = data['名称'] || '';
             const res = data['資源'] || '';
-            const pName = data['パッシブ名'] || '';
+            const pName = data['E.G.O パッシブ名'] || '';
             const cond = data['発動条件'] || '';
             const effect = data['効果'] || '';
-            
             const aAttr = data['覚醒スキル属性'] || '';
             const aEffect = data['覚醒スキル効果'] || '';
-            
             const eAttr = data['侵蝕スキル属性'] || '';
             const eEffect = data['侵蝕スキル'] || '';
             const unique = data['固有'] || '';
 
-            // 各セクションの間に \n\n を入れ、ラベル名も指定通りに記述
             textToCopy = `【${rank}】名称:${name}\n資源:${res}\nパッシブ名:${pName}\n発動条件:${cond}\n効果:${effect}\n\n覚醒スキル属性:${aAttr}\n覚醒スキル効果:${aEffect}\n\n侵蝕スキル属性:${eAttr}\n侵蝕スキル:${eEffect}\n\n固有:${unique}`;
 
         } else {
-            // 他のカテゴリは通常通りの全項目コピー
+            // その他のカテゴリ
             textToCopy = Array.from(fields).map(f => {
                 const label = f.querySelector('.field-label').innerText;
                 const value = f.querySelector('.field-value').innerText;
@@ -473,7 +485,6 @@ footer {
 
 </body>
 </html>
-
 
 
 
