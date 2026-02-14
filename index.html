@@ -295,6 +295,7 @@ select:focus {
     font-weight:bold;
     letter-spacing:0.05em;
 
+    /* ★ 縦書き */
     writing-mode: vertical-rl;
     text-orientation: upright;
 
@@ -308,6 +309,15 @@ select:focus {
         filter 0.2s ease;
 }
 
+.copy-btn.copied{
+    background:
+        linear-gradient(
+            180deg,
+            #2e7d32 0%,
+            #1b5e20 100%
+        );
+    color:#eaffea;
+}
 
 /* ============================
    スクロールバー
