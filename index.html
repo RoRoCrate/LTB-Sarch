@@ -428,27 +428,45 @@ body {
         });
     }
 
-    function renderFields(key) {
-        searchInputsContainer.innerHTML = '';
-        SEARCH_FIELDS[key].forEach(f => {
-            const div = document.createElement('div');
-            div.className = 'search-input-group';
-            div.innerHTML = `<label>${f.label}</label>`;
-            const input = document.createElement(f.type === 'select' ? 'select' : 'input');
-            if (f.type !== 'select') input.type = f.type;
-            if (f.type === 'select') {
-                f.options.forEach(o => {
-                    const opt = document.createElement('option');
-                    opt.value = o; opt.textContent = o || 'すべて';
-                    input.appendChild(opt);
-                });
-            }
-            input.id = f.id;
-            input.addEventListener('input', performSearch);
-            div.appendChild(input);
-            searchInputsContainer.appendChild(div);
-        });
-    }
+   function renderFields(key) {
+    searchInputsContainer.innerHTML = '';
+
+    SEARCH_FIELDS[key].forEach(f => {
+
+        const div = document.createElement('div');
+        div.className = 'search-input-group';
+
+        /* ★ ここが重要：縦並び固定 */
+        div.style.display = 'flex';
+        div.style.flexDirection = 'column';
+
+        const label = document.createElement('label');
+        label.textContent = f.label;
+
+        const input = document.createElement(
+            f.type === 'select' ? 'select' : 'input'
+        );
+
+        if (f.type !== 'select') input.type = f.type;
+
+        if (f.type === 'select') {
+            f.options.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o;
+                opt.textContent = o || 'すべて';
+                input.appendChild(opt);
+            });
+        }
+
+        input.id = f.id;
+        input.addEventListener('input', performSearch);
+
+        div.appendChild(label);
+        div.appendChild(input);
+        searchInputsContainer.appendChild(div);
+    });
+}
+
 
     function performSearch() {
         const query = searchInput.value.toLowerCase();
@@ -646,7 +664,6 @@ body {
 
 </body>
 </html>
-
 
 
 
