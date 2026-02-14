@@ -545,24 +545,50 @@ footer {
         /* ========= 人格 / 特異人格 専用 ========= */
         if (key === 'identity' || key === 'singularidentity') {
 
-    const abilityText = data['能力値'] || '';
-    const resistText  = data['耐性'] || '';
+            const fixedOrderHTML = `
+                <div class="field"><span class="field-label">番号</span><span class="field-value">${item['番号'] || ''}</span></div>
+                <div class="field"><span class="field-label">名称</span><span class="field-value">${item['名称'] || ''}</span></div>
 
-    textToCopy =
-        `名称:${data['名称'] || ''}\n` +
-        `${abilityText}\n` +
-        `${resistText}\n\n` +
-        `${data['パッシブ名'] || ''}　${data['発動条件'] || ''}\n` +
-        `${data['効果'] || ''}\n\n` +
-        `戦術0名称:${data['戦術0名称'] || ''}  戦術0効果:${data['戦術0効果'] || ''}\n` +
-        `戦術1名称:${data['戦術1名称'] || ''}  戦術1効果:${data['戦術1効果'] || ''}\n` +
-        `戦術2名称:${data['戦術2名称'] || ''}  戦術2効果:${data['戦術2効果'] || ''}\n` +
-        `戦術3名称:${data['戦術3名称'] || ''}  戦術3効果:${data['戦術3効果'] || ''}\n` +
-        `戦術4名称:${data['戦術4名称'] || ''}  戦術4効果:${data['戦術4効果'] || ''}\n` +
-        `強化スキル:${data['強化スキル'] || ''}\n\n` +
-        `固有:${data['固有'] || ''}`;
-}
+                <div class="field">
+    <span class="field-label">能力値</span>
+    <span class="field-value">
+        HP:${item['HP'] || ''}　
+        SAN:${item['SAN'] || ''}　
+        速度:${item['速度'] || ''}　
+        弾丸:${item['弾丸'] || ''}
+    </span>
+</div>
 
+<div class="field">
+    <span class="field-label">耐性</span>
+    <span class="field-value">
+        斬撃:${item['斬撃'] || ''}　
+        打撃:${item['打撃'] || ''}　
+        貫通:${item['貫通'] || ''}
+    </span>
+</div>
+
+            `;
+
+            /* すでに表示したキーは除外 */
+            const excludedKeys = ['番号','名称','HP','SAN','速度','斬撃','打撃','貫通','弾丸'];
+
+            const restHTML = Object.entries(item)
+                .filter(([k, v]) => v && !excludedKeys.includes(k))
+                .map(([k, v]) =>
+                    `<div class="field"><span class="field-label">${k}</span><span class="field-value">${v}</span></div>`
+                ).join('');
+
+            return `
+                <div class="result-item" id="item-${idx}">
+                    <button class="copy-btn" onclick="copyDisplayedContent('item-${idx}')">コピー</button>
+                    <div class="item-body">
+                        ${fixedOrderHTML}
+                        ${restHTML}
+                    </div>
+                </div>
+            `;
+        }
 
         /* ========= その他カテゴリ（今まで通り） ========= */
         const normalHTML = Object.entries(item).map(([k, v]) => {
@@ -590,27 +616,49 @@ footer {
 
         // データをオブジェクトに格納
         const data = {};
-        fields.forEach(f => {
-            const label = f.querySelector('.field-label').innerText;
-            const value = f.querySelector('.field-value').innerText;
-            data[label] = value;
-        });
+        ffields.forEach(f => {
+        const label = f.querySelector('.field-label').innerText.trim();
+        const value = f.querySelector('.field-value').innerText.trim();
+
+        // 能力値を分解
+        if (label === '能力値') {
+            value.split(/　|\s+/).forEach(part => {
+                const [k, v] = part.split(':');
+                if (k && v) data[k.trim()] = v.trim();
+            });
+            return;
+        }
+
+        // 耐性を分解
+        if (label === '耐性') {
+            value.split(/　|\s+/).forEach(part => {
+                const [k, v] = part.split(':');
+                if (k && v) data[k.trim()] = v.trim();
+            });
+            return;
+        }
+
+        data[label] = value;
+    });
 
         if (key === 'identity' || key === 'singularidentity') {
-            textToCopy = 
-                `名称:${data['名称'] || ''}\n` +
-                `HP:${data['HP'] || ''}　SAN:${data['SAN'] || ''}　速度:${data['速度'] || ''}\n` +
-                `斬撃:${data['斬撃'] || ''}　貫通:${data['貫通'] || ''}　打撃:${data['打撃'] || ''}　弾丸:${data['弾丸'] || ''}\n\n` +
-                `${data['パッシブ名'] || ''}　${data['発動条件'] || ''}\n` +
-                `${data['効果'] || ''}\n\n` +
-                `戦術0名称: ${data['戦術0名称'] || ''} 　戦術0効果: ${data['戦術0効果'] || ''}\n` +
-                `戦術1名称: ${data['戦術1名称'] || ''} 　戦術1効果: ${data['戦術1効果'] || ''}\n` +
-                `戦術2名称: ${data['戦術2名称'] || ''} 　戦術2効果: ${data['戦術2効果'] || ''}\n` +
-                `戦術3名称: ${data['戦術3名称'] || ''} 　戦術3効果: ${data['戦術3効果'] || ''}\n` +
-                `戦術4名称: ${data['戦術4名称'] || ''} 　戦術4効果: ${data['戦術4効果'] || ''}\n` +
-                `強化スキル: ${data['強化スキル'] || ''}\n\n` +
-                `固有: ${data['固有'] || ''}`;
 
+        textToCopy =
+`名称:${data['名称'] || ''}
+HP:${data['HP'] || ''}　SAN:${data['SAN'] || ''}　速度:${data['速度'] || ''}
+斬撃:${data['斬撃'] || ''}　貫通:${data['貫通'] || ''}　打撃:${data['打撃'] || ''}　弾丸:${data['弾丸'] || ''}
+
+${data['パッシブ名'] || ''}　${data['発動条件'] || ''}
+${data['効果'] || ''}
+
+戦術0名称:${data['戦術0名称'] || ''}　戦術0効果:${data['戦術0効果'] || ''}
+戦術1名称:${data['戦術1名称'] || ''}　戦術1効果:${data['戦術1効果'] || ''}
+戦術2名称:${data['戦術2名称'] || ''}　戦術2効果:${data['戦術2効果'] || ''}
+戦術3名称:${data['戦術3名称'] || ''}　戦術3効果:${data['戦術3効果'] || ''}
+戦術4名称:${data['戦術4名称'] || ''}　戦術4効果:${data['戦術4効果'] || ''}
+
+強化スキル:${data['強化スキル'] || ''}
+固有:${data['固有'] || ''}`;
         } else if (key === 'mental') {
             // 精神用カスタムフォーマット
             textToCopy = 
@@ -662,19 +710,12 @@ footer {
         }
 
         try {
-    await navigator.clipboard.writeText(textToCopy);
-
-    btn.innerText = '完了';
-    btn.classList.add('copied');   // ←追加
-
-    setTimeout(() => {
-        btn.innerText = 'コピー';
-        btn.classList.remove('copied'); // ←追加
-    }, 800);
-
-} catch (err) {
-    alert('コピーに失敗しました');
-}
+            await navigator.clipboard.writeText(textToCopy);
+            const originalText = btn.innerText;
+            btn.innerText = '完了!';
+           
+            setTimeout(() => { btn.innerText = originalText; btn.style.background = 'var(--accent)'; }, 800);
+        } catch (err) { alert('コピーに失敗しました'); }
     }
 
     csvSelector.onchange = loadData;
