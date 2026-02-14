@@ -216,6 +216,164 @@ footer {
     text-align: center;
     flex-shrink: 0;
 }
+
+/* ============================
+   Study Room / 書斎テーマ
+============================ */
+
+:root {
+    --bg: #1b140d;        /* 暗い木 */
+    --card: #2a2016;      /* 机の色 */
+    --muted: #a28a6a;
+    --accent: #c4a35a;    /* 真鍮 */
+    --radius: 6px;
+}
+
+/* 全体背景 */
+body {
+    background:
+        radial-gradient(circle at top, #3a2b1a 0%, #120c07 70%);
+    color: #f1e6d2;
+}
+
+/* 上部タイトルバー */
+.top-white-bar {
+    background: linear-gradient(180deg,#3b2a18,#24180e);
+    color: #e7d6ad;
+    border-bottom: 1px solid #c4a35a;
+    letter-spacing: 0.15em;
+}
+
+/* メインカード */
+.search-container {
+    background: linear-gradient(180deg,#2f2418,#1f170f);
+    border: 2px solid #c4a35a;
+    box-shadow:
+        0 0 30px rgba(0,0,0,0.7),
+        inset 0 0 40px rgba(0,0,0,0.5);
+}
+
+/* 見出し */
+h2 {
+    color: #e7d6ad;
+    border-bottom: 1px solid #c4a35a;
+    letter-spacing: 0.2em;
+}
+
+/* ラベル */
+label {
+    color: #d4c1a0;
+}
+
+/* 入力欄 */
+input[type="text"],
+input[type="number"],
+select {
+    background: #1a120b;
+    color: #f1e6d2;
+    border: 1px solid #6e5a3c;
+}
+
+input:focus,
+select:focus {
+    border-color: #c4a35a;
+    box-shadow: 0 0 6px rgba(196,163,90,0.8);
+}
+
+/* 検索結果 */
+.result-item {
+    background: linear-gradient(180deg,#2b2016,#1c140d);
+    border-left: 5px solid #c4a35a;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
+}
+
+/* コピー按钮 */
+.copy-btn {
+    background: #c4a35a;
+    color: #1b140d;
+}
+
+.copy-btn:hover {
+    background: #e0c27a;
+}
+
+/* 項目名 */
+.field-label {
+    color: #e0c27a;
+}
+
+/* スクロールバー */
+#searchResultWrapper::-webkit-scrollbar {
+    width: 8px;
+}
+#searchResultWrapper::-webkit-scrollbar-thumb {
+    background: #c4a35a;
+}
+#searchResultWrapper::-webkit-scrollbar-track {
+    background: #1a120b;
+}
+
+/* フッター */
+footer {
+    color: #bfa989;
+}
+body {
+    background-image:
+      url("https://www.transparenttextures.com/patterns/wood-pattern.png");
+}
+body {
+    font-family: "游明朝","Times New Roman",serif;
+}
+/* ============================
+   可読性向上パッチ
+============================ */
+
+/* 全体の文字を少し明るく */
+body {
+    color: #f6f1e7;
+}
+
+/* フォントをやや太めに */
+body, input, select, button {
+    font-weight: 500;
+}
+
+/* 入力文字 */
+input[type="text"],
+input[type="number"],
+select {
+    font-size: 16px;
+}
+
+/* 検索結果の本文 */
+.field-value {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #f4ecd9;
+}
+
+/* 項目ラベル */
+.field-label {
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+}
+
+/* 検索結果カードの明度を少し上げる */
+.result-item {
+    background: linear-gradient(180deg,#332618,#241a11);
+}
+
+/* 見出しを強調 */
+h2 {
+    text-shadow: 0 0 6px rgba(255,220,150,0.5);
+}
+
+/* 入力欄を明るめに */
+input[type="text"],
+input[type="number"],
+select {
+    background: #241a11;
+}
     </style>
 </head>
 <body>
@@ -502,6 +660,7 @@ footer {
 
 </body>
 </html>
+
 
 
 
