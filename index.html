@@ -688,12 +688,19 @@ footer {
         }
 
         try {
-            await navigator.clipboard.writeText(textToCopy);
-            const originalText = btn.innerText;
-            btn.innerText = '完了!';
-            btn.style.background = '#4ade80';
-            setTimeout(() => { btn.innerText = originalText; btn.style.background = 'var(--accent)'; }, 800);
-        } catch (err) { alert('コピーに失敗しました'); }
+    await navigator.clipboard.writeText(textToCopy);
+
+    btn.innerText = '完了';
+    btn.classList.add('copied');
+
+    setTimeout(() => {
+        btn.innerText = 'コピー';
+        btn.classList.remove('copied'); 
+    }, 800);
+
+} catch (err) {
+    alert('コピーに失敗しました');
+}
     }
 
     csvSelector.onchange = loadData;
