@@ -710,12 +710,19 @@ ${data['効果'] || ''}
         }
 
         try {
-            await navigator.clipboard.writeText(textToCopy);
-            const originalText = btn.innerText;
-            btn.innerText = '完了!';
-           
-            setTimeout(() => { btn.innerText = originalText; btn.style.background = 'var(--accent)'; }, 800);
-        } catch (err) { alert('コピーに失敗しました'); }
+    await navigator.clipboard.writeText(textToCopy);
+
+    btn.innerText = '完了';
+    btn.classList.add('copied');   // ← 緑にする
+
+    setTimeout(() => {
+        btn.innerText = 'コピー';
+        btn.classList.remove('copied'); // ← 赤に戻す
+    }, 800);
+
+} catch (err) {
+    alert('コピーに失敗しました');
+}
     }
 
     csvSelector.onchange = loadData;
@@ -725,4 +732,3 @@ ${data['効果'] || ''}
 
 </body>
 </html>
-
