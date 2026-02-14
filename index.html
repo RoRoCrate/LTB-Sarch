@@ -297,7 +297,19 @@ footer {
     gap: 10px;
     align-items: flex-start;
 }
+#searchInput {
+    width: 100%;
+}
 
+/* 検索カテゴリの select をフル幅に */
+.search-controls > div:first-child select {
+    width: 100%;
+}
+
+/* 動的検索項目は2列幅のまま */
+.search-input-group {
+    width: calc(50% - 5px);
+}
     </style>
 </head>
 <body>
@@ -662,6 +674,7 @@ footer {
 
 </body>
 </html>
+
 
 
 
