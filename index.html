@@ -21,7 +21,10 @@
     <link rel="icon" href="/path/to/favicon.ico">
     
     <style>
-/* フォントの読み込み (Corporate Logo) */
+/* ============================
+   フォント
+============================ */
+
 @font-face {
     font-family: 'Corporate-Logo-Bold';
     src: url('https://cdn.jsdelivr.net/gh/logotype/corporate-logo-font@master/fonts/Corporate-Logo-Bold-ver3.woff2') format('woff2');
@@ -31,376 +34,251 @@
     src: url('https://cdn.jsdelivr.net/gh/logotype/corporate-logo-font@master/fonts/Corporate-Logo-Medium-ver3.woff2') format('woff2');
 }
 
+/* ============================
+   変数
+============================ */
+
 :root {
-    --bg: #071121;
-    --card: #0b1220;
-    --muted: #9aa6b2;
-    --accent: #60a5fa;
-    --radius: 12px;
-    font-family: 'Corporate-Logo-Medium', sans-serif;
+    --bg: #1b140d;
+    --card: #2a2016;
+    --muted: #a28a6a;
+    --accent: #c4a35a;
+    --radius: 6px;
 }
 
-/* --- レイアウト基本設定 --- */
+/* ============================
+   全体
+============================ */
+
 body {
-    background-color: var(--bg);
-    color: #fff;
+    background:
+        radial-gradient(circle at top, #3a2b1a 0%, #120c07 70%);
+    background-image:
+        url("https://www.transparenttextures.com/patterns/wood-pattern.png");
+    color: #f6f1e7;
     margin: 0;
-    padding-top: 60px; 
+    padding-top: 60px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* 画面全体もスクロール可能にしておく（フッター確認用） */
     min-height: 100vh;
-    overflow-y: auto; 
-    box-sizing: border-box;
+    overflow-y: auto;
+    font-family: "游明朝","Times New Roman",serif;
+    font-weight: 500;
 }
 
-/* ページ上部の白いバー */
+/* ============================
+   上部バー
+============================ */
+
 .top-white-bar {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 50px;
-    background-color: #ffffff;
-    color: #000000;
+    background: linear-gradient(180deg,#3b2a18,#24180e);
+    color: #e7d6ad;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-family: 'Corporate-Logo-Bold', sans-serif;
     font-size: 1.2rem;
     z-index: 9999;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-}
-
-/* --- メインコンテナ --- */
-.search-container {
-    background: var(--card);
-    padding: 20px;
-    border-radius: var(--radius);
-    width: 95%;
-    max-width: 800px;
-    /* 重要：スマホで入力欄が縦に伸びても良いように height は auto。
-       ただし、検索結果のスクロールを活かすために max-height を設定。
-    */
-    height: auto;
-    max-height: 85vh; 
-    border: 1px solid var(--accent);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-    margin: 10px auto 20px auto; 
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-}
-
-h2 { 
-    text-align: center; 
-    color: var(--accent); 
-    margin: 0; 
-    font-family: 'Corporate-Logo-Bold', sans-serif;
-    font-size: 1.4rem;
-    border-bottom: 1px solid #1e203d; 
-    padding-bottom: 10px; 
-    letter-spacing: 0.1em;
-    flex-shrink: 0;
-}
-
-/* --- 検索フォーム --- */
-.search-controls { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 10px; 
-    margin-top: 10px; 
-    flex-shrink: 0; /* 入力欄が潰れないように固定 */
-}
-
-#searchInputsContainer { 
-    display: flex; 
-    flex-wrap: wrap; 
-    gap: 8px; 
-}
-
-/* 検索項目（番号、名称など）の幅設定 */
-.search-input-group { 
-    width: calc(50% - 4px); 
-    box-sizing: border-box; 
-}
-
-input[type="text"], input[type="number"], select {
-    width: 100%; 
-    padding: 10px;
-    background: #1e203d; 
-    border: 1px solid #5560aa;
-    color: #fff; 
-    border-radius: 8px; 
-    box-sizing: border-box; 
-    outline: none;
-    font-size: 16px; /* iOSズーム防止 */
-}
-
-input:focus, select:focus { border-color: var(--accent); }
-
-label { 
-    display: block; 
-    font-size: 0.75rem; 
-    color: var(--muted); 
-    margin-bottom: 2px; 
-    font-family: 'Corporate-Logo-Bold', sans-serif; 
-}
-
-/* --- 検索結果エリア（ここがスクロールする） --- */
-#searchResultWrapper {
-    margin-top: 15px;
-    flex: 1;              /* 入力欄以外の残りの高さをすべて使う */
-    overflow-y: auto;     /* はみ出た分をスクロール */
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 10px;
-    min-height: 100px;    /* 最低限の結果表示領域を確保 */
-    -webkit-overflow-scrolling: touch;
-}
-
-.result-item {
-    background: rgba(255, 255, 255, 0.03); 
-    padding: 12px; 
-    margin-bottom: 10px;
-    border-radius: 8px; 
-    border-left: 4px solid var(--accent);
-    position: relative;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.copy-btn {
-    position: absolute; 
-    right: 8px; 
-    top: 8px;
-    background: var(--accent); 
-    color: #000; 
-    border: none;
-    padding: 6px 12px;
-    border-radius: 6px; 
-    cursor: pointer; 
-    font-size: 0.7rem; 
-    z-index: 10;
-}
-
-.field { margin-bottom: 4px; font-size: 0.95rem; line-height: 1.4; display: flex; flex-direction: column; }
-.field-label { 
-    color: var(--accent); 
-    font-size: 0.75rem; 
-    margin-bottom: 1px; 
-}
-
-/* --- スマホ専用調整 --- */
-@media (max-width: 600px) {
-    .search-input-group { 
-        width: 100%; /* スマホでは1列にして縦に伸ばす */
-    }
-    .search-container { 
-        padding: 12px; 
-        max-height: 82vh; /* 画面の約8割まで広がるのを許容 */
-    }
-    h2 { font-size: 1.2rem; }
-}
-
-@media (min-width: 601px) {
-    .field { flex-direction: row; }
-    .field-label { min-width: 110px; margin-right: 8px; }
-}
-
-/* --- フッター --- */
-footer {
-    width: 100%;
-    padding: 20px 0;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-/* ============================
-   Study Room / 書斎テーマ
-============================ */
-
-:root {
-    --bg: #1b140d;        /* 暗い木 */
-    --card: #2a2016;      /* 机の色 */
-    --muted: #a28a6a;
-    --accent: #c4a35a;    /* 真鍮 */
-    --radius: 6px;
-}
-
-/* 全体背景 */
-body {
-    background:
-        radial-gradient(circle at top, #3a2b1a 0%, #120c07 70%);
-    color: #f1e6d2;
-}
-
-/* 上部タイトルバー */
-.top-white-bar {
-    background: linear-gradient(180deg,#3b2a18,#24180e);
-    color: #e7d6ad;
     border-bottom: 1px solid #c4a35a;
     letter-spacing: 0.15em;
 }
 
-/* メインカード */
+/* ============================
+   メインコンテナ
+============================ */
+
 .search-container {
     background: linear-gradient(180deg,#2f2418,#1f170f);
-    border: 2px solid #c4a35a;
+    padding: 20px;
+    border-radius: var(--radius);
+    width: 95%;
+    max-width: 800px;
+    height: auto;
+    border: 2px solid var(--accent);
     box-shadow:
         0 0 30px rgba(0,0,0,0.7),
         inset 0 0 40px rgba(0,0,0,0.5);
+    margin: 10px auto 20px auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
-/* 見出し */
+/* ============================
+   見出し
+============================ */
+
 h2 {
+    text-align: center;
     color: #e7d6ad;
-    border-bottom: 1px solid #c4a35a;
+    margin: 0;
+    font-size: 1.4rem;
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 10px;
     letter-spacing: 0.2em;
+    text-shadow: 0 0 6px rgba(255,220,150,0.5);
 }
 
-/* ラベル */
+/* ============================
+   検索フォーム
+============================ */
+
+.search-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+#searchInputsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.search-input-group {
+    width: calc(50% - 4px);
+}
+
 label {
+    font-size: 0.8rem;
     color: #d4c1a0;
+    margin-bottom: 2px;
 }
 
-/* 入力欄 */
 input[type="text"],
 input[type="number"],
 select {
-    background: #1a120b;
-    color: #f1e6d2;
+    width: 100%;
+    padding: 10px;
+    background: #241a11;
     border: 1px solid #6e5a3c;
+    color: #f1e6d2;
+    border-radius: 6px;
+    font-size: 16px;
 }
 
 input:focus,
 select:focus {
-    border-color: #c4a35a;
+    border-color: var(--accent);
     box-shadow: 0 0 6px rgba(196,163,90,0.8);
 }
 
-/* 検索結果 */
+/* ============================
+   検索結果エリア（★修正済み）
+============================ */
+
+#searchResultWrapper {
+    margin-top: 15px;
+    flex: none;
+    height: 300px;
+    overflow-y: auto;
+    resize: vertical;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 10px;
+    min-height: 150px;
+    max-height: 80vh;
+}
+
+/* ============================
+   検索結果カード
+============================ */
+
+.result-item {
+    background: linear-gradient(180deg,#3a2c1c,#2a1f14);
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+    border-left: 5px solid var(--accent);
+    position: relative;
+}
+
 .result-item .item-body {
-    background: linear-gradient(
-        180deg,
-        #f4ecd8,
-        #e6d7b8
-    );
+    background: linear-gradient(180deg,#f4ecd8,#e6d7b8);
     padding: 12px;
     border-radius: 3px;
     color: #3a2b1a;
 }
 
-/* 本文テキスト */
-.result-item .field-value {
+.field {
+    margin-bottom: 4px;
+    display: flex;
+    flex-direction: column;
+}
+
+.field-label {
+    color: #7a5a2e;
+    font-size: 0.8rem;
+    letter-spacing: 0.05em;
+}
+
+.field-value {
+    font-size: 0.95rem;
+    line-height: 1.6;
     color: #3a2b1a;
 }
 
-/* 項目名（見出し） */
-.result-item .field-label {
-    color: #7a5a2e;
-}
-/* コピーボタン */
+/* ============================
+   コピーボタン
+============================ */
+
 .copy-btn {
-    background: #c4a35a;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    background: var(--accent);
     color: #1b140d;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.7rem;
 }
 
 .copy-btn:hover {
     background: #e0c27a;
 }
 
-/* 項目名 */
-.field-label {
-    color: #e0c27a;
-}
+/* ============================
+   スクロールバー
+============================ */
 
-/* スクロールバー */
 #searchResultWrapper::-webkit-scrollbar {
     width: 8px;
 }
 #searchResultWrapper::-webkit-scrollbar-thumb {
-    background: #c4a35a;
+    background: var(--accent);
 }
 #searchResultWrapper::-webkit-scrollbar-track {
     background: #1a120b;
 }
 
-/* フッター */
-footer {
-    color: #bfa989;
-}
-body {
-    background-image:
-      url("https://www.transparenttextures.com/patterns/wood-pattern.png");
-}
-body {
-    font-family: "游明朝","Times New Roman",serif;
-}
 /* ============================
-   可読性向上パッチ
+   スマホ
 ============================ */
 
-/* 全体の文字を少し明るく */
-body {
-    color: #f6f1e7;
+@media (max-width:600px){
+    .search-input-group {
+        width:100%;
+    }
 }
 
-/* フォントをやや太めに */
-body, input, select, button {
-    font-weight: 500;
+/* ============================
+   フッター
+============================ */
+
+footer {
+    width: 100%;
+    padding: 20px 0;
+    text-align: center;
+    color: #bfa989;
 }
 
-/* 入力文字 */
-input[type="text"],
-input[type="number"],
-select {
-    font-size: 16px;
-}
-
-/* 検索結果の本文 */
-.field-value {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: #f4ecd9;
-}
-
-/* 項目ラベル */
-.field-label {
-    font-size: 0.8rem;
-    letter-spacing: 0.05em;
-}
-
-/* 検索結果カードの明度を少し上げる */
-.result-item {
-    background: linear-gradient(180deg,#332618,#241a11);
-}
-
-/* 見出しを強調 */
-h2 {
-    text-shadow: 0 0 6px rgba(255,220,150,0.5);
-}
-
-/* 入力欄を明るめに */
-input[type="text"],
-input[type="number"],
-select {
-    background: #241a11;
-}
-.result-item {
-    background: linear-gradient(
-        180deg,
-        #3a2c1c,
-        #2a1f14
-    );
-}
-        #searchResultWrapper {
-    resize: vertical;
-    overflow: auto;
-    min-height: 150px;
-    max-height: 80vh;
-}
     </style>
 </head>
 <body>
@@ -687,6 +565,7 @@ select {
 
 </body>
 </html>
+
 
 
 
