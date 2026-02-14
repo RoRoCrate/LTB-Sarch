@@ -143,36 +143,32 @@ h2 {
 
 #searchInputsContainer {
     display: flex;
-    flex-wrap: wrap; /* 折り返しを許可 */
-    gap: 15px;      /* 要素間の余白 */
+    flex-wrap: wrap; 
+    gap: 15px;
     margin-bottom: 10px;
-    align-items: flex-end; /* ラベルの高さが違っても下揃えにする */
+    align-items: flex-end; 
 }
 
 .search-input-group {
-    /* 修正: 固定の高さを削除し、柔軟な幅を持たせる */
     flex: 1 1 180px; 
     display: flex;
     flex-direction: column;
-    min-width: 140px; /* 極端に狭くなるのを防ぐ */
+    min-width: 140px; 
 }
 /* ============================
    共通キーワード入力欄の調整
 ============================ */
-
-/* 共通キーワードの親ディブも他と揃える */
 .search-controls > div {
     width: 100%;
     margin-top: 5px;
 }
 
-/* 入力欄の微調整 */
 input[type="text"],
 input[type="number"],
 select {
-    box-sizing: border-box; /* パディングを含めた幅計算にする */
+    box-sizing: border-box; 
     width: 100%;
-    height: 40px; /* 高さを統一 */
+    height: 40px;
     padding: 8px;
     background: #241a11;
     border: 1px solid #6e5a3c;
@@ -671,16 +667,3 @@ footer {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
