@@ -138,23 +138,48 @@ h2 {
 }
 
 /* ============================
-   動的検索入力
+   動的検索入力 (修正版)
 ============================ */
 
 #searchInputsContainer {
-    display:flex;
-    flex-wrap:wrap;
-    gap:10px;
-    align-items:flex-start;
+    display: flex;
+    flex-wrap: wrap; /* 折り返しを許可 */
+    gap: 15px;      /* 要素間の余白 */
+    margin-bottom: 10px;
+    align-items: flex-end; /* ラベルの高さが違っても下揃えにする */
 }
 
 .search-input-group {
-    min-height: 55px;
-    min-height:70px;
-    display:flex;
-    flex-direction:column;
+    /* 修正: 固定の高さを削除し、柔軟な幅を持たせる */
+    flex: 1 1 180px; 
+    display: flex;
+    flex-direction: column;
+    min-width: 140px; /* 極端に狭くなるのを防ぐ */
+}
+/* ============================
+   共通キーワード入力欄の調整
+============================ */
+
+/* 共通キーワードの親ディブも他と揃える */
+.search-controls > div {
+    width: 100%;
+    margin-top: 5px;
 }
 
+/* 入力欄の微調整 */
+input[type="text"],
+input[type="number"],
+select {
+    box-sizing: border-box; /* パディングを含めた幅計算にする */
+    width: 100%;
+    height: 40px; /* 高さを統一 */
+    padding: 8px;
+    background: #241a11;
+    border: 1px solid #6e5a3c;
+    color: #f1e6d2;
+    border-radius: 6px;
+    font-size: 16px;
+}
 /* ============================
    ラベル・入力欄
 ============================ */
@@ -417,17 +442,12 @@ footer {
         });
     }
 
-   function renderFields(key) {
+  function renderFields(key) {
     searchInputsContainer.innerHTML = '';
 
     SEARCH_FIELDS[key].forEach(f => {
-
         const div = document.createElement('div');
         div.className = 'search-input-group';
-
-        /* ★ ここが重要：縦並び固定 */
-        div.style.display = 'flex';
-        div.style.flexDirection = 'column';
 
         const label = document.createElement('label');
         label.textContent = f.label;
@@ -455,7 +475,6 @@ footer {
         searchInputsContainer.appendChild(div);
     });
 }
-
 
     function performSearch() {
         const query = searchInput.value.toLowerCase();
