@@ -136,6 +136,17 @@ h2 {
     margin-top: 10px;
 }
 
+/* 検索カテゴリ・キーワード入力を同幅にする */
+.search-controls > div {
+    width: 100%;
+}
+
+/* 動的項目だけ2列 */
+#searchInputsContainer .search-input-group {
+    width: calc(50% - 5px);
+}
+
+
 #searchInputsContainer {
     display: flex;
     flex-wrap: wrap;
@@ -297,19 +308,7 @@ footer {
     gap: 10px;
     align-items: flex-start;
 }
-#searchInput {
-    width: 100%;
-}
 
-/* 検索カテゴリの select をフル幅に */
-.search-controls > div:first-child select {
-    width: 100%;
-}
-
-/* 動的検索項目は2列幅のまま */
-.search-input-group {
-    width: calc(50% - 5px);
-}
     </style>
 </head>
 <body>
