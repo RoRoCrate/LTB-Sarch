@@ -482,23 +482,24 @@ body {
                 <div class="field"><span class="field-label">名称</span><span class="field-value">${item['名称'] || ''}</span></div>
 
                 <div class="field">
-                    <span class="field-label">能力値</span>
-                    <span class="field-value">
-                        HP:${item['HP'] || ''}　
-                        SAN:${item['SAN'] || ''}　
-                        速度:${item['速度'] || ''}
-                    </span>
-                </div>
+    <span class="field-label">能力値</span>
+    <span class="field-value">
+        HP:${item['HP'] || ''}　
+        SAN:${item['SAN'] || ''}　
+        速度:${item['速度'] || ''}　
+        弾丸:${item['弾丸'] || ''}
+    </span>
+</div>
 
-                <div class="field">
-                    <span class="field-label">耐性</span>
-                    <span class="field-value">
-                        斬撃:${item['斬撃'] || ''}　
-                        打撃:${item['打撃'] || ''}　
-                        貫通:${item['貫通'] || ''}　
-                        弾丸:${item['弾丸'] || ''}
-                    </span>
-                </div>
+<div class="field">
+    <span class="field-label">耐性</span>
+    <span class="field-value">
+        斬撃:${item['斬撃'] || ''}　
+        打撃:${item['打撃'] || ''}　
+        貫通:${item['貫通'] || ''}
+    </span>
+</div>
+
             `;
 
             /* すでに表示したキーは除外 */
